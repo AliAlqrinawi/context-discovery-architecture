@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #f2efe9; }
+  * { box-sizing: border-box; }
+  a { color: #2f5fb0; text-decoration: none; border-bottom: 1px solid rgba(47,95,176,0.3); }
+  a:hover { color: #1b1a17; border-bottom-color: #1b1a17; }
+</style>
+</helmet>
+
+<div style="background: #f2efe9; color: #1b1a17; font-family: 'Newsreader', Georgia, serif; font-size: 17px; line-height: 1.6; padding: 64px 32px 120px; display: flex; flex-direction: column; align-items: center; text-wrap: pretty;">
+
+<div style="width: 100%; max-width: 940px; display: flex; flex-direction: column; gap: 64px;">
+
+  <header style="display: flex; flex-direction: column; gap: 24px; border-bottom: 2px solid #1b1a17; padding-bottom: 32px;">
+    <div style="display: flex; flex-wrap: wrap; gap: 10px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase;">
+      <span style="padding: 4px 9px; background: #1b1a17; color: #f7f5f1;">Architecture repository</span>
+      <span style="padding: 4px 9px; border: 1px solid #cfc9bd; color: #6b675f;">Phase 1 · specified, not built</span>
+      <span style="padding: 4px 9px; border: 1px solid #cfc9bd; color: #6b675f;">No implementation code</span>
+      <span style="padding: 4px 9px; background: #2f5fb0; color: #fffefb;">Frozen · freeze review 02</span>
+      <span style="padding: 4px 9px; border: 1px solid #cfc9bd; color: #6b675f;">Source: AliAlqrinawi/context-discovery-research @ main</span>
+    </div>
+    <h1 style="margin: 0; font-family: 'Newsreader', serif; font-weight: 500; font-size: 56px; line-height: 1.06; letter-spacing: -0.02em;">Context Discovery · Phase&nbsp;1<br><span style="color: #6b675f;">production architecture</span></h1>
+    <p style="margin: 0; max-width: 720px; font-size: 20px; color: #46433d;">One deterministic command — <span style="font-family: 'IBM Plex Mono', monospace; font-size: 16px;">diff in, context bundle out</span> — that performs only the discovery moves Phase 0 proved, attaches a reason and a lever to every item, and enforces a token budget with a visible drop list. It does not review, judge, score, or call a model.</p>
+    <p style="margin: 0; max-width: 720px; font-size: 15px; color: #6b675f;">Full written architecture: <a href="architecture/README.md">architecture/README.md</a> — verification, modules, interfaces, structure, diagrams, traceability, acceptance, and nine ADRs.</p>
+  </header>
+
+  <section style="display: flex; flex-direction: column; gap: 28px;">
+    <div style="display: flex; align-items: baseline; gap: 16px; border-bottom: 1px solid #d8d3c8; padding-bottom: 10px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #a09a8e;">01</span>
+      <h2 style="margin: 0; font-weight: 500; font-size: 32px; letter-spacing: -0.01em;">Verification of the validated research</h2>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+      <div style="background: #fffefb; border: 1px solid #e0dcd3; padding: 22px 24px; display: flex; flex-direction: column; gap: 10px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; color: #6b675f;">The project</span>
+        <p style="margin: 0; font-size: 16px;">A documented validation effort, not a shipped product: can intelligently selected project context produce a better AI code review than a raw Git diff, while using significantly less context than the whole repository? Framed permanently as three conditions — <strong>A</strong> diff only, <strong>B</strong> diff + whole repo (yardstick, never the product), <strong>C</strong> diff + targeted bundle.</p>
+      </div>
+      <div style="background: #fffefb; border: 1px solid #e0dcd3; padding: 22px 24px; display: flex; flex-direction: column; gap: 10px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; color: #6b675f;">The hypothesis — status: open</span>
+        <p style="margin: 0; font-size: 16px;">Phase 0 validated <em>answer keys</em>, not <em>review outcomes</em>. It proved the classification method discriminates, produced a bounded catalogue of discovery moves, established the two-lever cost model, and disproved forward import-following. The A/B/C runs were never executed and scored, so the central claim that context improves a review remains untested.</p>
+      </div>
+    </div>
+
+    <div style="background: #fffefb; border: 1px solid #e0dcd3; border-left: 3px solid #2f5fb0; padding: 22px 24px; display: flex; flex-direction: column; gap: 12px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; color: #2f5fb0;">What Phase 0 earned, move by move</span>
+      <div style="display: grid; grid-template-columns: 1fr; gap: 8px; font-size: 15px;">
+        <div style="display: grid; grid-template-columns: 1fr auto; gap: 16px; padding-bottom: 8px; border-bottom: 1px dotted #e0dcd3;"><span>Read the changed file's own surroundings — imports, siblings, class body</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b675f;">Exp 1</span></div>
+        <div style="display: grid; grid-template-columns: 1fr auto; gap: 16px; padding-bottom: 8px; border-bottom: 1px dotted #e0dcd3;"><span>Fetch a named collaborator / model / enum — depth one, via the PSR-4 map</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b675f;">Exp 1, 4</span></div>
+        <div style="display: grid; grid-template-columns: 1fr auto; gap: 16px; padding-bottom: 8px; border-bottom: 1px dotted #e0dcd3;"><span>Reverse-caller lookup for a changed signature — high severity, twice</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b675f;">Exp 1, 4</span></div>
+        <div style="display: grid; grid-template-columns: 1fr auto; gap: 16px; padding-bottom: 8px; border-bottom: 1px dotted #e0dcd3;"><span>Fetch config / migration — schema and environment invariants</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b675f;">Exp 3 · n=1</span></div>
+        <div style="display: grid; grid-template-columns: 1fr auto; gap: 16px;"><span>Return empty / flag rather than fetch — a correct outcome, not a failure</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b675f;">Exp 1, 2, 3</span></div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+      <div style="background: #fffefb; border: 1px solid #e0dcd3; padding: 22px 24px; display: flex; flex-direction: column; gap: 14px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; color: #6b675f;">Phase 1 scope — IN</span>
+        <div style="display: flex; flex-direction: column; gap: 12px; font-size: 15.5px;">
+          <div style="display: flex; gap: 12px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #2f5fb0; padding-top: 3px;">R1</span><span>Diff parsing and full changed-file loading. <span style="color: #6b675f;">Exp 1</span></span></div>
+          <div style="display: flex; gap: 12px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #2f5fb0; padding-top: 3px;">R2</span><span>Depth-one named-reference resolution via PSR-4, minimal slice. <span style="color: #6b675f;">Exp 1, 4</span></span></div>
+          <div style="display: flex; gap: 12px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #2f5fb0; padding-top: 3px;">R3</span><span>Reverse-caller lookup for changed signatures — a crude grep. <span style="color: #6b675f;">Exp 1, 4</span></span></div>
+          <div style="display: flex; gap: 12px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #2f5fb0; padding-top: 3px;">R4</span><span>A bundle carrying a reason and a lever per item, with token accounting. <span style="color: #6b675f;">Method; Exp 1, 3</span></span></div>
+          <div style="display: flex; gap: 12px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #2f5fb0; padding-top: 3px;">R5</span><span>A flag path for expensive or unknowable dependencies. <span style="color: #6b675f;">Exp 1, 3</span></span></div>
+        </div>
+      </div>
+      <sc-if value="{{ showExclusions }}" hint-placeholder-val="{{ true }}">
+      <div style="background: #fffefb; border: 1px solid #e0dcd3; padding: 22px 24px; display: flex; flex-direction: column; gap: 14px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; color: #a8462f;">Intentionally out of scope</span>
+        <div style="display: flex; flex-direction: column; gap: 12px; font-size: 15.5px;">
+          <div style="display: flex; gap: 12px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #a8462f; padding-top: 3px;">X1</span><span>Forward import-following. <strong>Never</strong> — disproven, would have missed 3 of Exp 1's 4 findings.</span></div>
+          <div style="display: flex; gap: 12px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #a8462f; padding-top: 3px;">X2</span><span>Transitive / depth &gt; 1 resolution. Not yet — no finding needed it.</span></div>
+          <div style="display: flex; gap: 12px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #a8462f; padding-top: 3px;">X3</span><span>A dedicated config/migration resolver. Not yet — n=1, handled by the flag path.</span></div>
+          <div style="display: flex; gap: 12px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #a8462f; padding-top: 3px;">X4</span><span>Severity or quality scoring, or the review itself. <strong>Never.</strong></span></div>
+          <div style="display: flex; gap: 12px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #a8462f; padding-top: 3px;">X5</span><span>Any LLM call inside the tool. <strong>Never.</strong></span></div>
+          <div style="display: flex; gap: 12px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #a8462f; padding-top: 3px;">—</span><span>Index or call graph, SaaS, agents, events, plugins, multi-language, optimisation before measurement.</span></div>
+        </div>
+      </div>
+      </sc-if>
+    </div>
+
+    <sc-if value="{{ showGaps }}" hint-placeholder-val="{{ true }}">
+    <div style="background: #faf3ee; border: 1px solid #e6cfc4; padding: 22px 24px; display: flex; flex-direction: column; gap: 10px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; color: #a8462f;">Evidence gaps found while reading the source of truth</span>
+      <p style="margin: 0; font-size: 15.5px;"><code style="font-family: 'IBM Plex Mono', monospace; font-size: 13.5px;">docs/03-phase0/summary.md</code> — cited by the README, the ROADMAP, all three research ADRs and every introduction document — <strong>does not exist</strong> in the repository, nor does <code style="font-family: 'IBM Plex Mono', monospace; font-size: 13.5px;">CONTRIBUTING.md</code>. Three files at the <code style="font-family: 'IBM Plex Mono', monospace; font-size: 13.5px;">docs/</code> root are 0-byte duplicates of <code style="font-family: 'IBM Plex Mono', monospace; font-size: 13.5px;">docs/00-introduction/</code>, and the README's map uses directory numbers (<code style="font-family: 'IBM Plex Mono', monospace; font-size: 13.5px;">03-phase0</code>, <code style="font-family: 'IBM Plex Mono', monospace; font-size: 13.5px;">05-phase1</code>, <code style="font-family: 'IBM Plex Mono', monospace; font-size: 13.5px;">decisions</code>) that the tree does not have, so every cross-link is broken. Nothing here was inferred about the missing files; conclusions attributed to them are taken from the documents that quote them. Full list: <a href="architecture/evidence-gaps.md">evidence-gaps.md</a>.</p>
+    </div>
+    </sc-if>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 28px;">
+    <div style="display: flex; align-items: baseline; gap: 16px; border-bottom: 1px solid #d8d3c8; padding-bottom: 10px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #a09a8e;">02</span>
+      <h2 style="margin: 0; font-weight: 500; font-size: 32px; letter-spacing: -0.01em;">The architecture</h2>
+    </div>
+
+    <p style="margin: 0; max-width: 760px; font-size: 18px;">One process, one command, nine ordered stages — a batch transformation, not a service. A <strong>pure pipeline behind ports</strong>: a thin CLI shell, one use case, pure discovery logic, and adapters that are the only code touching the filesystem, <span style="font-family: 'IBM Plex Mono', monospace; font-size: 15px;">composer.json</span>, PHP source text, or the output stream.</p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
+      <div style="background: #fffefb; border: 1px solid #e0dcd3; padding: 20px 22px; display: flex; flex-direction: column; gap: 10px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; color: #6b675f;">Inside the boundary</span>
+        <p style="margin: 0; font-size: 15px;">Diff parsing · assertion extraction · the lever decision · depth-one resolution and member slicing · bounded caller grep · assumption text · bundle assembly, token accounting, budget drops · two serialisations.</p>
+      </div>
+      <div style="background: #fffefb; border: 1px solid #e0dcd3; padding: 20px 22px; display: flex; flex-direction: column; gap: 10px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; color: #6b675f;">Consumed, never owned</span>
+        <p style="margin: 0; font-size: 15px;">Git (the diff arrives as text; the tool never invokes it) · the target repository, read-only on local disk · the PSR-4 autoload map. All reads are scoped inside <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13.5px;">--repo</span>; an escape or unreadable path becomes a flag.</p>
+      </div>
+      <div style="background: #fffefb; border: 1px solid #e0dcd3; padding: 20px 22px; display: flex; flex-direction: column; gap: 10px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; color: #a8462f;">Downstream, deliberately absent</span>
+        <p style="margin: 0; font-size: 15px;">The reviewer model, the prompt, the A-vs-C scoring, and every server, queue, daemon, watcher or hook. There is no runtime beyond the command.</p>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <h3 style="margin: 0; font-weight: 500; font-size: 22px;">Internal modules and responsibilities</h3>
+      <p style="margin: 0; font-size: 15px; color: #6b675f;">25 classes and 5 interfaces. Layers listed inward-out; dependencies point inward only.</p>
+
+      <div style="display: flex; flex-direction: column; gap: 2px; background: #e0dcd3; border: 1px solid #e0dcd3;">
+        <div style="display: grid; grid-template-columns: 1.1fr 2fr 0.5fr; gap: 2px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #6b675f;">
+          <div style="background: #f2efe9; padding: 10px 14px;">Module</div>
+          <div style="background: #f2efe9; padding: 10px 14px;">Responsibility</div>
+          <div style="background: #f2efe9; padding: 10px 14px;">Traces to</div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1.1fr 2fr 0.5fr; gap: 2px;">
+          <div style="background: #fffefb; padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">Domain\Diff</div>
+          <div style="background: #fffefb; padding: 12px 14px; font-size: 15px;">Immutable <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">Diff · ChangedFile · ChangedRegion · ChangedMember</span>. Knows nothing about diff text.</div>
+          <div style="background: #fffefb; padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #2f5fb0;">R1</div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1.1fr 2fr 0.5fr; gap: 2px;">
+          <div style="background: #fffefb; padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">Domain\Assertion</div>
+          <div style="background: #fffefb; padding: 12px 14px; font-size: 15px;">The core concept: what the diff claims but cannot prove. Four kinds — <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">SameFileSymbolAbsence · NamedReference · ChangedSignature · UnverifiablePremise</span>.</div>
+          <div style="background: #fffefb; padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #2f5fb0;">P1 · ADR-002</div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1.1fr 2fr 0.5fr; gap: 2px;">
+          <div style="background: #fffefb; padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">Domain\Bundle</div>
+          <div style="background: #fffefb; padding: 12px 14px; font-size: 15px;">Items, levers, provenance, budget, drops. Enforces the invariant: <strong>no item without a reason and a lever</strong>. <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">ResolvedAssertion</span> is the single value handed from resolution to assembly.</div>
+          <div style="background: #fffefb; padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #2f5fb0;">R4 · P5</div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1.1fr 2fr 0.5fr; gap: 2px;">
+          <div style="background: #fffefb; padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">Ports (5)</div>
+          <div style="background: #fffefb; padding: 12px 14px; font-size: 15px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">SourceRepository · ClassLocator · MemberSlicer · CallSiteSearch · BundleWriter</span>. Interfaces only; the entire I/O surface. Diff parsing and token estimation are pure classes, not ports — no I/O, one implementation each.</div>
+          <div style="background: #fffefb; padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #2f5fb0;">P9</div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1.1fr 2fr 0.5fr; gap: 2px;">
+          <div style="background: #fffefb; padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">Discovery\Extraction</div>
+          <div style="background: #fffefb; padding: 12px 14px; font-size: 15px;">Four extractors, one per validated move: own-file (absences + siblings), named reference (four recognised forms, each earned by an experiment), changed signature, unverifiable premise. Fixed order, de-duplicated, deterministic.</div>
+          <div style="background: #fffefb; padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #2f5fb0;">R1 R2 R3 R5</div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1.1fr 2fr 0.5fr; gap: 2px;">
+          <div style="background: #fffefb; padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">Discovery\Lever</div>
+          <div style="background: #fffefb; padding: 12px 14px; font-size: 15px;">One pure function implementing the fetch-vs-flag rule, plus the closed premise catalogue. The single decision point in the system.</div>
+          <div style="background: #fffefb; padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #2f5fb0;">R5 · P2</div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1.1fr 2fr 0.5fr; gap: 2px;">
+          <div style="background: #fffefb; padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">Discovery\Resolution</div>
+          <div style="background: #fffefb; padding: 12px 14px; font-size: 15px;">Own-file (use block, enclosing member, named siblings) · named reference (PSR-4 → one member) · caller (bounded grep). Returning nothing routes to a flag, never to silence.</div>
+          <div style="background: #fffefb; padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #2f5fb0;">R1 R2 R3 · P10</div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1.1fr 2fr 0.5fr; gap: 2px;">
+          <div style="background: #fffefb; padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">Discovery\Flagging</div>
+          <div style="background: #fffefb; padding: 12px 14px; font-size: 15px;">One fixed statement per catalogue premise. No free text, no inference, no model.</div>
+          <div style="background: #fffefb; padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #2f5fb0;">R5</div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1.1fr 2fr 0.5fr; gap: 2px;">
+          <div style="background: #fffefb; padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">Assembly</div>
+          <div style="background: #fffefb; padding: 12px 14px; font-size: 15px;">Assembler (rejects any item lacking a reason) · pure token estimate · fixed drop priority — not a relevance score: flags are never dropped, named-reference slices go first · budget enforcer that records every drop.</div>
+          <div style="background: #fffefb; padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #2f5fb0;">R4 · P7</div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1.1fr 2fr 0.5fr; gap: 2px;">
+          <div style="background: #fffefb; padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">Adapters (5)</div>
+          <div style="background: #fffefb; padding: 12px 14px; font-size: 15px;">Root-scoped filesystem · Composer PSR-4 locator · PHP tokenizer slicer · scoped in-process grep (lexicographically ordered, for determinism) · JSON and Markdown writers.</div>
+          <div style="background: #fffefb; padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #2f5fb0;">A001 A004 A006 A007</div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1.1fr 2fr 0.5fr; gap: 2px;">
+          <div style="background: #fffefb; padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">Pipeline · Cli</div>
+          <div style="background: #fffefb; padding: 12px 14px; font-size: 15px;">One use case running the nine spec responsibilities in order; options (<span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">--budget</span> required), plain constructor wiring — the only place a concrete adapter is named — exit codes.</div>
+          <div style="background: #fffefb; padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #2f5fb0;">P8 · A002 A008</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+      <div style="background: #fffefb; border: 1px solid #e0dcd3; padding: 22px 24px; display: flex; flex-direction: column; gap: 12px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; color: #6b675f;">Inputs — nothing else exists</span>
+        <div style="display: flex; flex-direction: column; gap: 8px; font-size: 15px;">
+          <div style="display: grid; grid-template-columns: 150px 1fr; gap: 12px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">--diff &lt;path|-&gt;</span><span>Unified diff for the commit under review</span></div>
+          <div style="display: grid; grid-template-columns: 150px 1fr; gap: 12px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">--repo &lt;path&gt;</span><span>Repository root, read-only</span></div>
+          <div style="display: grid; grid-template-columns: 150px 1fr; gap: 12px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">--budget &lt;int&gt;</span><span>Required — the research fixes no number</span></div>
+          <div style="display: grid; grid-template-columns: 150px 1fr; gap: 12px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">--caller-scope</span><span>Grep prefix, default <span style="font-family: 'IBM Plex Mono', monospace;">app/</span></span></div>
+          <div style="display: grid; grid-template-columns: 150px 1fr; gap: 12px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">composer.json</span><span>PSR-4 map, read from the repo</span></div>
+        </div>
+        <p style="margin: 4px 0 0; font-size: 14px; color: #6b675f;">No config file, no environment variables, no network, no state directory, no index, and no <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">--out</span> — shell redirection covers it.</p>
+      </div>
+      <div style="background: #fffefb; border: 1px solid #e0dcd3; padding: 22px 24px; display: flex; flex-direction: column; gap: 12px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; color: #6b675f;">Outputs</span>
+        <div style="display: flex; flex-direction: column; gap: 8px; font-size: 15px;">
+          <div style="display: grid; grid-template-columns: 150px 1fr; gap: 12px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">stdout</span><span>The bundle: JSON (<span style="font-family: 'IBM Plex Mono', monospace;">bundle_version 1</span>) or Markdown</span></div>
+          <div style="display: grid; grid-template-columns: 150px 1fr; gap: 12px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">stderr</span><span>Diagnostics — the only channel; each also produces a flag item</span></div>
+          <div style="display: grid; grid-template-columns: 150px 1fr; gap: 12px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">exit 0 / 1 / 2</span><span>Bundle produced / usage error / repo unreadable</span></div>
+        </div>
+        <p style="margin: 4px 0 0; font-size: 14px; color: #6b675f;">An empty-but-valid bundle — Experiment 2's correct answer — exits <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">0</span>. Emptiness is a result, not a failure.</p>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <h3 style="margin: 0; font-weight: 500; font-size: 22px;">Public contract — the bundle</h3>
+      <div style="background: #1b1a17; color: #ece7dd; padding: 22px 24px; overflow-x: auto;">
+        <pre style="margin: 0; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; line-height: 1.65;">{
+  "bundle_version": 1,
+  "budget_tokens": 8000,
+  "used_tokens": 2143,
+  "items": [
+    { "lever": "fetched",
+      "reason": "changed call site depends on PlaidAccount::forItem() and official_name",
+      "assertion_kind": "named_reference",
+      "provenance": { "path": "app/Models/PlaidAccount.php", "member": "forItem", "lines": [41, 58] },
+      "payload": "&lt;minimal slice&gt;", "tokens": 180 },
+    { "lever": "flagged",
+      "reason": "reconciliation assumes a surrounding DB transaction; caller not verified",
+      "assertion_kind": "unverifiable_premise",
+      "provenance": { "path": "app/Services/Plaid/PlaidAccountService.php", "member": "syncFromResponse" },
+      "payload": "ASSUMPTION: this code assumes a surrounding transaction; caller not checked",
+      "tokens": 14 }
+  ],
+  "dropped": [ { "reason": "route wiring for reauth endpoint", "note": "below budget priority" } ]
+}</pre>
+      </div>
+      <p style="margin: 0; font-size: 15px; color: #6b675f;">Item order is fixed so output is diffable: absence → changed signature → named reference → premise, then path, then member. <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">assertion_kind</span> exists so precision can later be measured <em>per move</em>. Port and collaborator signatures: <a href="architecture/03-interfaces.md">03-interfaces.md</a>.</p>
+    </div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 28px;">
+    <div style="display: flex; align-items: baseline; gap: 16px; border-bottom: 1px solid #d8d3c8; padding-bottom: 10px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #a09a8e;">03</span>
+      <h2 style="margin: 0; font-weight: 500; font-size: 32px; letter-spacing: -0.01em;">Project structure</h2>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 20px;">
+      <div style="background: #fffefb; border: 1px solid #e0dcd3; padding: 22px 24px; overflow-x: auto;">
+        <pre style="margin: 0; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; line-height: 1.7; color: #2e2b26;">context-discovery/
+├── bin/context-discover
+├── composer.json              # PSR-4 only, zero runtime deps
+├── src/
+│   ├── Cli/                   Options · Wiring · DiscoverCommand
+│   ├── Pipeline/              DiscoverContext (9 stages)
+│   ├── Domain/
+│   │   ├── Diff/              Diff · ChangedFile · ChangedRegion
+│   │   ├── Assertion/         Assertion · AssertionKind
+│   │   ├── Bundle/            Bundle · BundleItem · Lever
+│   │   └── Source/            SourceSlice · CallSite
+│   ├── Ports/                 5 interfaces
+│   ├── Discovery/
+│   │   ├── Parsing/           UnifiedDiffParser (pure)
+│   │   ├── Extraction/        4 extractors
+│   │   ├── Lever/             LeverPolicy · PremiseCatalogue
+│   │   ├── Resolution/        3 resolvers
+│   │   └── Flagging/          AssumptionWriter
+│   ├── Assembly/              Assembler · TokenEstimate
+│   │                          ItemPriority · Budget
+│   └── Adapters/              Filesystem · Autoload · Php
+│                              Search · Serialization
+├── tests/
+│   ├── Unit/                  mirrors src/ one-to-one
+│   ├── Acceptance/            ExperimentKeyTest + 4 fixtures
+│                              (diffs operator-supplied)
+│   └── Fakes/                 in-memory ports
+└── docs/architecture/         this repository, verbatim</pre>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; align-items: start;">
+        <div style="background: #fffefb; border: 1px solid #e0dcd3; padding: 22px 24px; display: flex; flex-direction: column; gap: 12px;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; color: #6b675f;">Domain boundaries</span>
+          <p style="margin: 0; font-size: 15px;"><strong>Diff</strong> — what changed. <strong>Assertion</strong> — what the change claims but cannot prove; the centre of gravity. <strong>Bundle</strong> — what the reviewer receives. Diff types never reference Assertion or Bundle types; Assertion carries a plain origin, not an object graph; Bundle carries plain provenance. No domain performs I/O, formatting, or token counting.</p>
+        </div>
+        <div style="background: #fffefb; border: 1px solid #e0dcd3; padding: 22px 24px; display: flex; flex-direction: column; gap: 12px;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; color: #6b675f;">Dependency rules</span>
+          <div style="display: flex; flex-direction: column; gap: 8px; font-size: 15px;">
+            <span>1 · Dependencies point inward. <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">Domain</span> imports nothing.</span>
+            <span>2 · Discovery, Assembly and Pipeline see <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">Ports</span> only — never an adapter.</span>
+            <span>3 · Adapters see Ports and Domain only.</span>
+            <span>4 · <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">Cli\Wiring</span> is the one place a concrete adapter is named.</span>
+            <span>5 · No cycles, no singletons, no service locator, no runtime class discovery.</span>
+          </div>
+        </div>
+        <div style="background: #fffefb; border: 1px solid #e0dcd3; padding: 22px 24px; display: flex; flex-direction: column; gap: 12px;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; color: #6b675f;">Naming</span>
+          <p style="margin: 0; font-size: 15px;">PHP 8.2, strict types, PSR-12. Interfaces named for the capability with no suffix; implementations carry the distinguishing qualifier. Vocabulary is the research repository's, verbatim — <em>assertion, lever, fetched, flagged, reason, provenance, dropped, premise, slice</em>. JSON fields are snake_case.</p>
+          <sc-if value="{{ showExclusions }}" hint-placeholder-val="{{ true }}">
+          <p style="margin: 0; font-size: 15px; color: #a8462f;">Forbidden names, because each signals scope escape: <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">*Engine, *Agent, *Plugin, *EventBus, *Listener, *Cache, *Index, *Graph, *Score, *Severity, *Reviewer, *Client</span>.</p>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 32px;">
+    <div style="display: flex; align-items: baseline; gap: 16px; border-bottom: 1px solid #d8d3c8; padding-bottom: 10px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #a09a8e;">04</span>
+      <h2 style="margin: 0; font-weight: 500; font-size: 32px; letter-spacing: -0.01em;">Diagrams</h2>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <h3 style="margin: 0; font-weight: 500; font-size: 20px;">4.1 · High-level architecture</h3>
+      <div style="background: #fffefb; border: 1px solid #e0dcd3; padding: 28px 24px; display: flex; flex-direction: column; gap: 20px;">
+        <div style="display: grid; grid-template-columns: 0.9fr auto 1.5fr auto 0.9fr; gap: 14px; align-items: center;">
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.09em; text-transform: uppercase; color: #a09a8e;">Inputs · local, free</span>
+            <div style="border: 1px solid #cfc9bd; background: #f7f5f1; padding: 10px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 12px;">unified diff<br><span style="color: #6b675f;">file or stdin</span></div>
+            <div style="border: 1px solid #cfc9bd; background: #f7f5f1; padding: 10px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 12px;">repository<br><span style="color: #6b675f;">PHP / Laravel, read-only</span></div>
+            <div style="border: 1px solid #cfc9bd; background: #f7f5f1; padding: 10px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 12px;">composer.json<br><span style="color: #6b675f;">PSR-4 map</span></div>
+            <div style="border: 1px solid #cfc9bd; background: #f7f5f1; padding: 10px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 12px;">--budget</div>
+          </div>
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 18px; color: #a09a8e;">&rarr;</span>
+          <div style="border: 2px solid #1b1a17; padding: 14px; display: flex; flex-direction: column; gap: 8px; background: #f7f5f1;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;">context-discover · one process</span>
+            <div style="background: #1b1a17; color: #f7f5f1; padding: 9px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 12px;">Cli — options · wiring · exit codes</div>
+            <div style="background: #fffefb; border: 1px solid #cfc9bd; padding: 9px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 12px;">Pipeline — DiscoverContext, 9 stages</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div style="background: #fffefb; border: 1px solid #cfc9bd; padding: 9px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 12px;">Discovery<br><span style="color: #6b675f;">extract · lever<br>resolve · flag</span></div>
+              <div style="background: #fffefb; border: 1px solid #cfc9bd; padding: 9px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 12px;">Assembly<br><span style="color: #6b675f;">bundle · priority<br>budget</span></div>
+            </div>
+            <div style="background: #fffefb; border: 1px dashed #2f5fb0; padding: 9px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #2f5fb0;">Adapters, reached only through Ports</div>
+          </div>
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 18px; color: #a09a8e;">&rarr;</span>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.09em; text-transform: uppercase; color: #a09a8e;">Outputs</span>
+            <div style="border: 1px solid #cfc9bd; background: #f7f5f1; padding: 10px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 12px;">bundle · JSON<br><span style="color: #6b675f;">bundle_version 1</span></div>
+            <div style="border: 1px solid #cfc9bd; background: #f7f5f1; padding: 10px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 12px;">bundle · Markdown</div>
+            <div style="border: 1px solid #cfc9bd; background: #f7f5f1; padding: 10px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 12px;">diagnostics · stderr</div>
+          </div>
+        </div>
+        <sc-if value="{{ showExclusions }}" hint-placeholder-val="{{ true }}">
+        <div style="border: 1px dashed #c9a08f; background: #faf3ee; padding: 14px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.09em; text-transform: uppercase; color: #a8462f;">Downstream · outside the boundary</span>
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b675f;">human assembles diff + bundle</span>
+          <span style="color: #c9a08f;">&rarr;</span>
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b675f;">reviewer model (condition C)</span>
+          <span style="color: #c9a08f;">&rarr;</span>
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6b675f;">A-vs-C scoring against the keys</span>
+        </div>
+        </sc-if>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <h3 style="margin: 0; font-weight: 500; font-size: 20px;">4.2 · Request flow — one invocation</h3>
+      <div style="background: #fffefb; border: 1px solid #e0dcd3; padding: 28px 24px; display: flex; flex-direction: column; gap: 0;">
+        <div style="display: grid; grid-template-columns: 34px 210px 1fr; gap: 14px; padding: 11px 0; border-bottom: 1px dotted #e0dcd3; align-items: baseline;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #a09a8e;">01</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">Cli\DiscoverCommand</span><span style="font-size: 15px;">Validate argv. <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">--budget</span> missing &rarr; exit 1 with the reason.</span></div>
+        <div style="display: grid; grid-template-columns: 34px 210px 1fr; gap: 14px; padding: 11px 0; border-bottom: 1px dotted #e0dcd3; align-items: baseline;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #a09a8e;">02</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">UnifiedDiffParser</span><span style="font-size: 15px;">Diff text &rarr; changed files, regions, changed member signatures.</span></div>
+        <div style="display: grid; grid-template-columns: 34px 210px 1fr; gap: 14px; padding: 11px 0; border-bottom: 1px dotted #e0dcd3; align-items: baseline;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #a09a8e;">03</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">LocalSourceRepository</span><span style="font-size: 15px;">Load the full current text of each changed file — analysis input, not payload.</span></div>
+        <div style="display: grid; grid-template-columns: 34px 210px 1fr; gap: 14px; padding: 11px 0; border-bottom: 1px dotted #e0dcd3; align-items: baseline;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #a09a8e;">04</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">AssertionExtractor</span><span style="font-size: 15px;">Four extractors, fixed order &rarr; a deterministic list of assertions.</span></div>
+        <div style="display: grid; grid-template-columns: 34px 210px 1fr; gap: 14px; padding: 11px 0; border-bottom: 1px dotted #e0dcd3; align-items: baseline;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #a09a8e;">05</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">LeverPolicy</span><span style="font-size: 15px;">Per assertion: named + single + depth-one on disk &rarr; <strong>fetched</strong>; reverse-graph-deep, runtime or data-state &rarr; <strong>flagged</strong>.</span></div>
+        <div style="display: grid; grid-template-columns: 34px 210px 1fr; gap: 14px; padding: 11px 0; border-bottom: 1px dotted #e0dcd3; align-items: baseline;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #a09a8e;">06</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">Resolvers</span><span style="font-size: 15px;">Dispatched by an explicit <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">match</span> on assertion kind — no probing. Own-file · named reference · caller grep &rarr; minimal slices. An empty result, an unreadable path or a truncated search falls through to a flag.</span></div>
+        <div style="display: grid; grid-template-columns: 34px 210px 1fr; gap: 14px; padding: 11px 0; border-bottom: 1px dotted #e0dcd3; align-items: baseline;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #a09a8e;">07</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">AssumptionWriter</span><span style="font-size: 15px;">One fixed statement per catalogue premise, with its reason and provenance.</span></div>
+        <div style="display: grid; grid-template-columns: 34px 210px 1fr; gap: 14px; padding: 11px 0; border-bottom: 1px dotted #e0dcd3; align-items: baseline;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #a09a8e;">08</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">BundleAssembler → Budget</span><span style="font-size: 15px;">Items get reason, lever, provenance; over budget, the lowest-priority item is dropped and recorded.</span></div>
+        <div style="display: grid; grid-template-columns: 34px 210px 1fr; gap: 14px; padding: 11px 0; align-items: baseline;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #a09a8e;">09</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">BundleWriter</span><span style="font-size: 15px;">JSON or Markdown to stdout or <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">--out</span>; diagnostics to stderr; exit 0.</span></div>
+        <p style="margin: 16px 0 0; font-size: 14px; color: #6b675f;">No step calls the network, spawns a process, writes into the repository, or returns to an earlier step.</p>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <h3 style="margin: 0; font-weight: 500; font-size: 20px;">4.3 · Context Discovery pipeline</h3>
+      <div style="background: #fffefb; border: 1px solid #e0dcd3; padding: 28px 24px; display: flex; flex-direction: column; gap: 16px;">
+        <div style="display: flex; flex-direction: column; gap: 12px; align-items: center;">
+          <div style="width: 100%; background: #f7f5f1; border: 1px solid #cfc9bd; padding: 11px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; text-align: center;">1 · parse diff &nbsp;→&nbsp; 2 · load full changed-file text</div>
+          <span style="font-family: 'IBM Plex Mono', monospace; color: #a09a8e;">↓</span>
+          <div style="width: 100%; background: #1b1a17; color: #f7f5f1; padding: 11px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; text-align: center;">3 · extract assertions — what the diff claims but cannot prove</div>
+          <div style="width: 100%; display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px;">
+            <div style="border: 1px solid #cfc9bd; background: #f7f5f1; padding: 12px; display: flex; flex-direction: column; gap: 6px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px;">SameFileSymbolAbsence<br>+ sibling reference</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #2f5fb0;">R1 · Exp 1</span></div>
+            <div style="border: 1px solid #cfc9bd; background: #f7f5f1; padding: 12px; display: flex; flex-direction: column; gap: 6px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px;">NamedReference<br>class · model · enum</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #2f5fb0;">R2 · Exp 1, 4</span></div>
+            <div style="border: 1px solid #cfc9bd; background: #f7f5f1; padding: 12px; display: flex; flex-direction: column; gap: 6px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px;">ChangedSignature<br>arity · param shape</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #2f5fb0;">R3 · Exp 1, 4</span></div>
+            <div style="border: 1px solid #cfc9bd; background: #f7f5f1; padding: 12px; display: flex; flex-direction: column; gap: 6px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px;">UnverifiablePremise<br>closed catalogue</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #2f5fb0;">R5 · Exp 1, 3</span></div>
+          </div>
+          <span style="font-family: 'IBM Plex Mono', monospace; color: #a09a8e;">↓</span>
+          <div style="width: 100%; border: 2px solid #2f5fb0; padding: 11px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; text-align: center; color: #2f5fb0;">4 · LeverPolicy — is the resolving source named, single and depth-one on disk?</div>
+          <div style="width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <div style="background: #f7f5f1; border: 1px solid #2f5fb0; padding: 10px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; text-align: center;">5a · FETCH minimal slice</div>
+              <div style="border: 1px solid #cfc9bd; background: #fffefb; padding: 10px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px;">OwnFileResolver<br><span style="color: #6b675f;">use block · enclosing member · named siblings</span></div>
+              <div style="border: 1px solid #cfc9bd; background: #fffefb; padding: 10px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px;">NamedReferenceResolver<br><span style="color: #6b675f;">PSR-4 → one member / model surface / enum</span></div>
+              <div style="border: 1px solid #cfc9bd; background: #fffefb; padding: 10px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px;">CallerResolver<br><span style="color: #6b675f;">bounded grep under --caller-scope</span></div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <div style="background: #f7f5f1; border: 1px solid #a8462f; padding: 10px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; text-align: center;">5b · FLAG one assumption</div>
+              <div style="border: 1px solid #cfc9bd; background: #fffefb; padding: 10px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px;">surrounding-transaction · atomic-lock-store<br>schema-index-support · data-state<br>unresolved-reference · call-sites-truncated</div>
+              <div style="border: 1px dashed #cfc9bd; background: #fffefb; padding: 10px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #6b675f;">5c · any resolver returning nothing arrives here — fail toward flagging, never toward silence</div>
+            </div>
+          </div>
+          <span style="font-family: 'IBM Plex Mono', monospace; color: #a09a8e;">↓</span>
+          <div style="width: 100%; background: #f7f5f1; border: 1px solid #cfc9bd; padding: 11px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; text-align: center;">6 · assemble (payload + reason + lever + provenance) &nbsp;→&nbsp; 7 · estimate &amp; enforce budget, record drops &nbsp;→&nbsp; 8 · serialise</div>
+        </div>
+        <sc-if value="{{ showExclusions }}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; padding-top: 4px;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #a8462f; border: 1px dashed #c9a08f; padding: 6px 10px;">✕ forward import-following — would attach at stage 3</span>
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #a8462f; border: 1px dashed #c9a08f; padding: 6px 10px;">✕ depth &gt; 1 — would attach at 5a → 3</span>
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #a8462f; border: 1px dashed #c9a08f; padding: 6px 10px;">✕ config / migration resolver — would attach at 5a</span>
+        </div>
+        </sc-if>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <h3 style="margin: 0; font-weight: 500; font-size: 20px;">4.4 · Module dependency</h3>
+      <div style="background: #fffefb; border: 1px solid #e0dcd3; padding: 28px 24px; display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: grid; grid-template-columns: 110px 1fr; gap: 16px; align-items: center;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #a09a8e;">Cli</span>
+          <div style="border: 1px solid #cfc9bd; background: #f7f5f1; padding: 11px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px;">Options · Wiring · DiscoverCommand · ExitCode <span style="color: #6b675f;">— sees everything; the only place adapters are named</span></div>
+        </div>
+        <div style="display: grid; grid-template-columns: 110px 1fr; gap: 16px; align-items: center;"><span></span><span style="font-family: 'IBM Plex Mono', monospace; color: #a09a8e; font-size: 14px;">↓ depends on</span></div>
+        <div style="display: grid; grid-template-columns: 110px 1fr; gap: 16px; align-items: center;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #a09a8e;">Pipeline</span>
+          <div style="border: 1px solid #cfc9bd; background: #f7f5f1; padding: 11px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px;">DiscoverContext <span style="color: #6b675f;">— stage order only</span></div>
+        </div>
+        <div style="display: grid; grid-template-columns: 110px 1fr; gap: 16px; align-items: center;"><span></span><span style="font-family: 'IBM Plex Mono', monospace; color: #a09a8e; font-size: 14px;">↓</span></div>
+        <div style="display: grid; grid-template-columns: 110px 1fr; gap: 16px; align-items: center;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #a09a8e;">Logic</span>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div style="border: 1px solid #cfc9bd; background: #f7f5f1; padding: 11px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px;">Discovery <span style="color: #6b675f;">extraction · lever · resolution · flagging</span></div>
+            <div style="border: 1px solid #cfc9bd; background: #f7f5f1; padding: 11px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px;">Assembly <span style="color: #6b675f;">assembler · priority · budget</span></div>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 110px 1fr; gap: 16px; align-items: center;"><span></span><span style="font-family: 'IBM Plex Mono', monospace; color: #a09a8e; font-size: 14px;">↓ interfaces only</span></div>
+        <div style="display: grid; grid-template-columns: 110px 1fr; gap: 16px; align-items: center;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #a09a8e;">Ports</span>
+          <div style="border: 2px solid #2f5fb0; background: #f7f5f1; padding: 11px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #2f5fb0;">SourceRepository · ClassLocator · MemberSlicer · CallSiteSearch · BundleWriter</div>
+        </div>
+        <div style="display: grid; grid-template-columns: 110px 1fr; gap: 16px; align-items: center;"><span></span><span style="font-family: 'IBM Plex Mono', monospace; color: #a09a8e; font-size: 14px;">↓</span></div>
+        <div style="display: grid; grid-template-columns: 110px 1fr; gap: 16px; align-items: center;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #a09a8e;">Domain</span>
+          <div style="border: 1px solid #1b1a17; background: #f7f5f1; padding: 11px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px;">Diff · Assertion (+ ResolvedAssertion) · Bundle · Source <span style="color: #6b675f;">— depends on nothing</span></div>
+        </div>
+        <div style="margin-top: 8px; border-top: 1px dotted #e0dcd3; padding-top: 14px; display: grid; grid-template-columns: 110px 1fr; gap: 16px; align-items: center;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #a09a8e;">Adapters</span>
+          <div style="border: 1px dashed #2f5fb0; background: #f7f5f1; padding: 11px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px;">Filesystem · Autoload · Php · Search · Serialization <span style="color: #6b675f;">— implement Ports, use Domain, know nothing else</span></div>
+        </div>
+      </div>
+      <p style="margin: 0; font-size: 15px; color: #6b675f;">Mermaid source for all four diagrams: <a href="architecture/04-diagrams.md">04-diagrams.md</a>.</p>
+    </div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 28px;">
+    <div style="display: flex; align-items: baseline; gap: 16px; border-bottom: 1px solid #d8d3c8; padding-bottom: 10px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #a09a8e;">05</span>
+      <h2 style="margin: 0; font-weight: 500; font-size: 32px; letter-spacing: -0.01em;">Architecture decision records</h2>
+    </div>
+    <p style="margin: 0; max-width: 760px; font-size: 17px;">Nine new decisions. Each states why it exists, the Phase 0 evidence behind it, and the alternatives rejected. These are additions to — never revisions of — research ADR-001, ADR-002 and ADR-003. A002, A003, A006 and A007 carry amendments from the freeze review.</p>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="background: #fffefb; border: 1px solid #e0dcd3; padding: 20px 22px; display: grid; grid-template-columns: 88px 1fr; gap: 20px;">
+        <a href="architecture/decisions/ADR-A001-php-cli-zero-dependencies.md" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; border: none;">A001</a>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <strong style="font-weight: 600; font-size: 17px;">PHP 8.2 CLI, one command, zero runtime dependencies</strong>
+          <span style="font-size: 15px;">The spec's inputs are the PSR-4 map and PHP files, and all four experiments are Laravel/Plaid commits; a dependency-free CLI is the smallest thing satisfying "no index, no graph, no service to call".</span>
+          <sc-if value="{{ showEvidence }}" hint-placeholder-val="{{ true }}"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #2f5fb0;">Evidence: implementation-spec inputs · Exp 1, 3, 4 · P8, P9 &nbsp;·&nbsp; Rejected: Python/Node core · language-agnostic adapters · Artisan command · hosted service · parser and console dependencies</span></sc-if>
+        </div>
+      </div>
+      <div style="background: #fffefb; border: 1px solid #e0dcd3; padding: 20px 22px; display: grid; grid-template-columns: 88px 1fr; gap: 20px;">
+        <a href="architecture/decisions/ADR-A002-pipeline-over-events.md" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; border: none;">A002</a>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <strong style="font-weight: 600; font-size: 17px;">A pure pipeline behind ports — not events, not plugins, not agents</strong>
+          <span style="font-size: 15px;">The spec already fixes nine ordered responsibilities; values passed between pure stages make each one checkable against a key and the whole run byte-reproducible.</span>
+          <sc-if value="{{ showEvidence }}" hint-placeholder-val="{{ true }}"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #2f5fb0;">Evidence: nine spec responsibilities · P5, P6, P8, P9 &nbsp;·&nbsp; Rejected: event bus (item provenance would depend on listener order) · plugin points · agent loop · god class · framework middleware</span></sc-if>
+        </div>
+      </div>
+      <div style="background: #fffefb; border: 1px solid #e0dcd3; padding: 20px 22px; display: grid; grid-template-columns: 88px 1fr; gap: 20px;">
+        <a href="architecture/decisions/ADR-A003-closed-move-set.md" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; border: none;">A003</a>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <strong style="font-weight: 600; font-size: 17px;">The move set is closed: four extractors, three resolvers</strong>
+          <span style="font-size: 15px;">Experiment 4 added no new move, so the boundedness is expressed in code. If the unrun sloppy commit needs a move the four cannot express, the bundle shows the gap instead of absorbing it.</span>
+          <sc-if value="{{ showEvidence }}" hint-placeholder-val="{{ true }}"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #2f5fb0;">Evidence: discovery-moves catalogue · Exp 4 "no new move" · ADR-003 &nbsp;·&nbsp; Rejected: plugin registry · config-driven rules · one generic extractor (loses per-move precision) · a fifth extractor for config now</span></sc-if>
+        </div>
+      </div>
+      <div style="background: #fffefb; border: 1px solid #e0dcd3; padding: 20px 22px; display: grid; grid-template-columns: 88px 1fr; gap: 20px;">
+        <a href="architecture/decisions/ADR-A004-tokenizer-slicing.md" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; border: none;">A004</a>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <strong style="font-weight: 600; font-size: 17px;">Slice members with PHP's built-in tokenizer — no AST library, no regex</strong>
+          <span style="font-size: 15px;">Every minimum-context list is member-level ("one method", "one small class"), and the missing-import finding needs the <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">use</span> block as a structure.</span>
+          <sc-if value="{{ showEvidence }}" hint-placeholder-val="{{ true }}"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #2f5fb0;">Evidence: Exp 1, 4 minimum-context lists · spec "not a whole file" · P8, P9 &nbsp;·&nbsp; Rejected: php-parser AST · regex parsing · whole-file fetch · a symbol index</span></sc-if>
+        </div>
+      </div>
+      <div style="background: #fffefb; border: 1px solid #e0dcd3; padding: 20px 22px; display: grid; grid-template-columns: 88px 1fr; gap: 20px;">
+        <a href="architecture/decisions/ADR-A005-slices-not-files.md" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; border: none;">A005</a>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <strong style="font-weight: 600; font-size: 17px;">Full changed-file text is an analysis input; only slices enter the bundle</strong>
+          <span style="font-size: 15px;">R1's "load the full text" is easily misread as "emit the file". Emitting it would fail Experiment 2's near-empty expectation by construction.</span>
+          <sc-if value="{{ showEvidence }}" hint-placeholder-val="{{ true }}"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #2f5fb0;">Evidence: Exp 2 "almost-empty bundle" · Exp 1 "one model and three method bodies" · spec precision criterion · P7 &nbsp;·&nbsp; Rejected: whole-file payloads · echoing the diff · configurable context radius</span></sc-if>
+        </div>
+      </div>
+      <div style="background: #fffefb; border: 1px solid #e0dcd3; padding: 20px 22px; display: grid; grid-template-columns: 88px 1fr; gap: 20px;">
+        <a href="architecture/decisions/ADR-A006-grep-not-graph.md" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; border: none;">A006</a>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <strong style="font-weight: 600; font-size: 17px;">Reverse-caller is a bounded in-process grep — not a graph, not a subprocess</strong>
+          <span style="font-size: 15px;">R3 says a crude grep over <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">app/</span> suffices and a call graph is "not yet earned"; the deep up-the-stack question is flagged, never searched.</span>
+          <sc-if value="{{ showEvidence }}" hint-placeholder-val="{{ true }}"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #2f5fb0;">Evidence: R3 · Exp 4 "a grep, not a file fetch" · fetch-vs-flag transaction example · ADR-002's ban on a maintained graph &nbsp;·&nbsp; Rejected: call graph · shelling out to grep/rg · unbounded results · AST-accurate resolution</span></sc-if>
+        </div>
+      </div>
+      <div style="background: #fffefb; border: 1px solid #e0dcd3; padding: 20px 22px; display: grid; grid-template-columns: 88px 1fr; gap: 20px;">
+        <a href="architecture/decisions/ADR-A007-token-estimate.md" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; border: none;">A007</a>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <strong style="font-weight: 600; font-size: 17px;">A naive, documented token estimate — not a real tokenizer</strong>
+          <span style="font-size: 15px;">The cost criterion is coarse and comparative ("dramatically below B"); one documented characters-per-token constant is adequate and keeps the tool model-agnostic and offline. The ratio's value is recorded as an architectural assumption, not evidence — the standard A008 sets.</span>
+          <sc-if value="{{ showEvidence }}" hint-placeholder-val="{{ true }}"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #2f5fb0;">Evidence: hypothesis cost wording · P7 · X5 · no optimisation before measurement &nbsp;·&nbsp; Rejected: BPE library · remote tokenizer · byte/word counts · no accounting</span></sc-if>
+        </div>
+      </div>
+      <div style="background: #fffefb; border: 1px solid #e0dcd3; padding: 20px 22px; display: grid; grid-template-columns: 88px 1fr; gap: 20px;">
+        <a href="architecture/decisions/ADR-A008-required-budget.md" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; border: none;">A008</a>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <strong style="font-weight: 600; font-size: 17px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 15px;">--budget</span> is required and has no default</strong>
+          <span style="font-size: 15px;">The research states the budget only relative to a condition-B measurement that does not exist. A default would be a fabricated threshold shaping every later measurement from inside the code.</span>
+          <sc-if value="{{ showEvidence }}" hint-placeholder-val="{{ true }}"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #2f5fb0;">Evidence: hypothesis "well under half of B's tokens" · requirements' ban on encoded assumptions · P7 &nbsp;·&nbsp; Rejected: a shipped default · size-derived heuristic · no budget · a config file</span></sc-if>
+        </div>
+      </div>
+      <div style="background: #fffefb; border: 1px solid #e0dcd3; padding: 20px 22px; display: grid; grid-template-columns: 88px 1fr; gap: 20px;">
+        <a href="architecture/decisions/ADR-A009-premise-catalogue.md" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; border: none;">A009</a>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <strong style="font-weight: 600; font-size: 17px;">Flags come from a closed premise catalogue, not from inference</strong>
+          <span style="font-size: 15px;">Six premises, each with one fixed sentence: three taken almost verbatim from the fetch-vs-flag examples, one for schema, two for resolution failures. The flag path is where judgement and an LLM would otherwise creep back in.</span>
+          <sc-if value="{{ showEvidence }}" hint-placeholder-val="{{ true }}"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #2f5fb0;">Evidence: fetch-vs-flag statements · Exp 1, 3 · X3, X4, X5 · P6, P10 &nbsp;·&nbsp; Rejected: free-text flags · model-generated text · heuristic premise inference · a config resolver instead · dropping the concern</span></sc-if>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 24px;">
+    <div style="display: flex; align-items: baseline; gap: 16px; border-bottom: 1px solid #d8d3c8; padding-bottom: 10px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #a09a8e;">06</span>
+      <h2 style="margin: 0; font-weight: 500; font-size: 32px; letter-spacing: -0.01em;">Acceptance — the bundle against the keys</h2>
+    </div>
+    <p style="margin: 0; max-width: 760px; font-size: 17px;">The acceptance test is the spec's, not a new one: for all four Phase 0 commits, the bundle must reproduce that commit's minimum-context list — fetching the fetch-type items, flagging the flag-type ones — within budget. Fixtures are named <span style="font-family: 'IBM Plex Mono', monospace; font-size: 14px;">experiment-0N</span> to sit beside the research files.</p>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px;">
+      <div style="background: #fffefb; border: 1px solid #e0dcd3; padding: 18px 20px; display: flex; flex-direction: column; gap: 8px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #6b675f;">experiment-01 · recall</span>
+        <span style="font-size: 15px;">Use block + <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">syncFromResponse</span>; the one caller; the model surface; <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">upsertFromPlaid</span>. Transaction premise must be <strong>flagged</strong>.</span>
+      </div>
+      <div style="background: #fffefb; border: 1px solid #e0dcd3; padding: 18px 20px; display: flex; flex-direction: column; gap: 8px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #6b675f;">experiment-02 · precision</span>
+        <span style="font-size: 15px;">Almost empty. Pulling the model "just in case" <strong>fails</strong> the test.</span>
+      </div>
+      <div style="background: #fffefb; border: 1px solid #e0dcd3; padding: 18px 20px; display: flex; flex-direction: column; gap: 8px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #6b675f;">experiment-03 · flags</span>
+        <span style="font-size: 15px;">Cache-store, schema-index and trashed-data premises flagged — no config/migration resolver is invoked.</span>
+      </div>
+      <div style="background: #fffefb; border: 1px solid #e0dcd3; padding: 18px 20px; display: flex; flex-direction: column; gap: 8px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #6b675f;">experiment-04 · callers</span>
+        <span style="font-size: 15px;">The <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">createLinkToken</span> slice, the enum, and call sites of <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">reactivate(</span> under <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">app/</span>.</span>
+      </div>
+    </div>
+    <p style="margin: 0; max-width: 760px; font-size: 15px; color: #a8462f;">The four diffs are an <strong>operator-supplied prerequisite</strong> — the research repository contains no patch text, so this project ships only the expectation files and the harness fails loudly when a fixture diff is absent. Fabricating one would grade the tool against invented ground truth.</p>
+    <p style="margin: 0; max-width: 760px; font-size: 15px; color: #6b675f;">Every fixture also asserts determinism (two runs, byte-identical) and budget honesty (used ≤ budget, every omission listed in <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">dropped</span>). Recall and precision are <em>reported</em> as counts; the tool grades nothing. Details, unit-test list, and the first-run instruction — the sloppy Experiment 5 commit — in <a href="architecture/06-acceptance.md">06-acceptance.md</a>.</p>
+  </section>
+
+  <footer style="border-top: 2px solid #1b1a17; padding-top: 24px; display: flex; flex-direction: column; gap: 10px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; color: #6b675f;">Handoff</span>
+    <p style="margin: 0; max-width: 760px; font-size: 16px;">Implementable in the order of <a href="architecture/README.md">architecture/README.md</a>: verification, architecture, structure, interfaces, diagrams, traceability, acceptance, decisions. Every module appears in the traceability matrix with its requirement and its experiment — <a href="architecture/05-traceability.md">05-traceability.md</a>. If a future module cannot be added to that table, that is the signal to stop rather than to design. The freeze record — findings, the fourteen corrections applied, and the eight recorded architectural assumptions — is in <a href="architecture/REVIEW-freeze-01.md">REVIEW-freeze-01.md</a> and <a href="architecture/REVIEW-freeze-02.md">REVIEW-freeze-02.md</a>.</p>
+  </footer>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showEvidence&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Review view&quot;},&quot;showExclusions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Review view&quot;},&quot;showGaps&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Review view&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      showEvidence: this.props.showEvidence ?? true,
+      showExclusions: this.props.showExclusions ?? true,
+      showGaps: this.props.showGaps ?? true,
+    };
+  }
+}
+</script>
+</body>
+</html>
