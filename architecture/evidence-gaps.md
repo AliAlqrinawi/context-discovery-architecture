@@ -74,6 +74,8 @@ them for evidence.
 | AA6 | PHP 8.2 and zero runtime dependencies | [ADR-A001](decisions/ADR-A001-php-cli-zero-dependencies.md) | Strongly consistent with the evidence (PSR-4 map input; four PHP commits) but the research never names a language |
 | AA7 | The exit-code taxonomy `0 / 1 / 2` | [03-interfaces](03-interfaces.md) | Ordinary CLI practice; no research basis, none needed |
 | AA8 | JSON as the default format, and `bundle_version` as a versioned contract | [03-interfaces](03-interfaces.md) | The implementation spec says the serialisation is *not* fixed by it |
+| AA9 | The token list that counts as a "persistence-write call" in the `surrounding-transaction` trigger | [ADR-A009](decisions/ADR-A009-premise-catalogue.md) | Exp 1 earned the premise from one reconciliation path; the general list of call shapes is not enumerated by any experiment. Experiment 4 is the precision guard — if the trigger fires there, the list is wrong |
+| AA10 | Widening the `data-state-after-behaviour-change` trigger from `SoftDeletes` to any trait removal inside a class body | [ADR-A009](decisions/ADR-A009-premise-catalogue.md) | Exp 3 earned it for `SoftDeletes` specifically (n=1). Narrowing back to that single trait is the correction if a fixture shows a false positive |
 
 None of these may be treated as validated. Each is stated here rather than argued inside the module
 that relies on it.

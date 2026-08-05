@@ -14,8 +14,40 @@ stated boundary, the flag path is where judgement (X4) and an LLM (X5) would cre
 
 ## Decision
 
-`Discovery\Lever\PremiseCatalogue` is a closed list of premise types, each with one fixed
-statement template and the experiment that earned it:
+`Discovery\Lever\PremiseCatalogue` is a closed list of premise types, each with **one trigger**, one
+fixed statement template, and the experiment that earned it. The trigger is what closes the
+recognition contract: a premise is emitted **if and only if** its trigger is present. There is no
+inference, no scoring, and no "looks risky" path — an implementer needs no heuristic of their own
+(P6, X4).
+
+### Triggers (the recognition contract)
+
+Every trigger is read from the changed region plus the changed file's own text — the two things R1
+already loads. No new input, no new module, no extra pass.
+
+| Premise | Trigger — emitted if and only if | Earned by |
+|---|---|---|
+| `surrounding-transaction` | The changed region contains **two or more persistence-write calls** *and* the enclosing member does not itself open a transaction (`DB::transaction(`, `DB::beginTransaction(`). Both facts come from the own-file text | Exp 1 — reconciliation safe only inside a transaction; the transaction lives in the caller |
+| `atomic-lock-store` | The changed region names `Cache::lock(` | Exp 3 — lock correctness depends on the deployed store being atomic |
+| `schema-index-support` | The changed region names `lockForUpdate(` or `sharedLock(` | Exp 3 — `findConnectedByInstitution(..., lockForUpdate: true)` under a filtered predicate |
+| `data-state-after-behaviour-change` | A **removed** diff line is a `use <Trait>;` statement inside a class body | Exp 3 — dropping `SoftDeletes` makes pre-existing trashed rows visible again |
+| `unresolved-reference` | A `NamedReference` assertion resolved to nothing — no PSR-4 entry, unreadable path, or member not found | P10 |
+| `call-sites-truncated` | A caller search hit `--max-call-sites` | P10, [ADR-A006](ADR-A006-grep-not-graph.md) |
+
+Two parts of the first and fourth triggers are wider than the single finding that earned them and are
+recorded as architectural assumptions, not evidence: the token list that counts as a
+"persistence-write call" (**AA9**) and the widening of trait removal beyond `SoftDeletes` (**AA10**) —
+see [evidence-gaps.md §5](../evidence-gaps.md).
+
+**Precision guards, not aspirations.** Experiment 2 must still produce an almost-empty bundle: its
+trace-logging diff names no `Cache::lock`, no lock read, removes no trait, and adds no persistence
+write, so no trigger fires. Experiment 4 is the guard for the transaction trigger — its key asks for
+no premise, so if the trigger fires there, **the trigger is wrong**, and that goes back to the
+research repository rather than being tuned here (ADR-A003).
+
+### Statements
+
+One fixed statement per premise:
 
 | Premise | Statement (fixed) | Earned by |
 |---|---|---|

@@ -9,9 +9,9 @@ added to it, that is the signal to stop.
 |---|---|---|---|
 | **R1** | Diff parsing + full changed-file load | `Discovery\Parsing\UnifiedDiffParser`, `Adapters\Filesystem\LocalSourceRepository`, `Domain\Diff\*`, `Discovery\Extraction\OwnFileAssertionExtractor`, `Discovery\Resolution\OwnFileResolver` | 1 |
 | **R2** | Depth-one named-reference resolution via PSR-4, minimal slice | `Discovery\Extraction\NamedReferenceAssertionExtractor`, `Discovery\Resolution\NamedReferenceResolver`, `Adapters\Autoload\ComposerPsr4ClassLocator`, `Adapters\Php\TokenizerMemberSlicer` | 1, 4 |
-| **R3** | Reverse-caller lookup for changed signatures (grep) | `Discovery\Extraction\ChangedSignatureAssertionExtractor`, `Discovery\Resolution\CallerResolver`, `Adapters\Search\ScopedGrepCallSiteSearch` | 1, 4 |
+| **R3** | Reverse-caller lookup for changed signatures (grep) | `Discovery\Extraction\ChangedSignatureAssertionExtractor`, `Discovery\Resolution\CallerResolver`, `Adapters\Search\ScopedGrepCallSiteSearch`. Signature changes only (Exp 4); a caller question that is not a signature change — Exp 1's transaction — is flag-type per `fetch-vs-flag.md` and counts as a catch per the spec's success criteria | 1, 4 |
 | **R4** | Bundle with reason + lever per item, token accounting | `Domain\Bundle\*`, `Assembly\BundleAssembler`, `Assembly\TokenEstimate`, `Adapters\Serialization\*` | method; 1, 3 |
-| **R5** | Flag path for expensive/unknowable dependencies | `Discovery\Extraction\UnverifiablePremiseAssertionExtractor`, `Discovery\Lever\LeverPolicy`, `Discovery\Lever\PremiseCatalogue`, `Discovery\Flagging\AssumptionWriter` | 1, 3 |
+| **R5** | Flag path for expensive/unknowable dependencies | `Discovery\Extraction\UnverifiablePremiseAssertionExtractor`, `Discovery\Lever\LeverPolicy`, `Discovery\Lever\PremiseCatalogue` (six premises, one literal trigger each — [ADR-A009](decisions/ADR-A009-premise-catalogue.md)), `Discovery\Flagging\AssumptionWriter` | 1, 3 |
 
 ## 2 · Discovery move → module → evidence
 
@@ -19,7 +19,7 @@ added to it, that is the signal to stop.
 |---|---|---|---|
 | Read the changed file's own surroundings | Fetch | `OwnFileAssertionExtractor` + `OwnFileResolver` | Exp 1 — missing `Log` import; `upsertFromPlaid` sibling |
 | Fetch a named collaborator / model / enum (depth one) | Fetch | `NamedReferenceAssertionExtractor` + `NamedReferenceResolver` | Exp 1 — `PlaidAccount`; Exp 4 — `PlaidClient::createLinkToken`, `PlaidItemStatus` |
-| Reverse-caller lookup | Fetch (bounded) / Flag (deep) | `ChangedSignatureAssertionExtractor` + `CallerResolver`; deep case → `AssumptionWriter` | Exp 1 — transaction; Exp 4 — `reactivate` signature |
+| Reverse-caller lookup | Fetch (bounded) / Flag (deep) | `ChangedSignatureAssertionExtractor` + `CallerResolver` for a changed signature; the deep case (Exp 1's transaction) → `surrounding-transaction` premise, never a search | Exp 1 — transaction (flag-type); Exp 4 — `reactivate` signature (fetch-type) |
 | Fetch config / migration | **Flag only in Phase 1** | `PremiseCatalogue` (`atomic-lock-store`, `schema-index-support`, `data-state-after-behaviour-change`) | Exp 3 — n=1, so X3 defers the resolver |
 | Return empty / flag rather than fetch | Flag / nothing | `LeverPolicy`, `AssumptionWriter`, and the *absence* of speculative fetching | Exp 1, 2, 3 |
 | ~~Forward import-following~~ | — | **no module** — banned structurally (stage 5 never re-enters stage 3) | Exp 1, disproven |

@@ -19,12 +19,20 @@ operator before the acceptance test can run, and the harness **fails loudly** �
 diff would grade the tool against invented ground truth, which is the one thing the answer-key
 method exists to prevent (ADR-001).
 
+**Each expectation entry is marked `fetch-expected` or `flag-satisfied`.** An experiment's step-4
+minimum-context list describes what a *human* assembled by hand, so some entries name a source the
+tool is not permitted to fetch. The implementation spec settles how to score those: flags count "as a
+catch for the flag-type findings (e.g. the transaction assumption)". The expectation files therefore
+carry the mark, and the harness compares each entry against it. Without the mark, the acceptance
+contract demands output the implementation contract forbids — the two must agree, and the research
+says which way.
+
 | Fixture | Expected bundle (from the experiment file) | Checks |
 |---|---|---|
-| `experiment-01` | `use` block + `syncFromResponse` body; the single caller of `syncFromResponse`; the `PlaidAccount` model surface (`forItem`, `official_name`, fillable/casts); `upsertFromPlaid` from the same repository file. Transaction premise **flagged**. | Recall of all four; missing-import assertion present; transaction item has `lever: flagged` |
+| `experiment-01` | `fetch-expected`: `use` block + `syncFromResponse` body; the `PlaidAccount` model surface (`forItem`, `official_name`, fillable/casts); `upsertFromPlaid` from the same repository file. `flag-satisfied`: the caller of `syncFromResponse` — the transaction question, resolved by the `surrounding-transaction` premise, because no signature changed and R3 restricts the caller grep to changed signatures | Recall of all four findings; missing-import assertion present; the transaction item has `lever: flagged`; **no** caller grep was performed |
 | `experiment-02` | **Almost empty.** At most nothing. | Precision: pulling the `PlaidAccount` model "just in case" **fails** the test |
-| `experiment-03` | Cache-store, schema-index, and trashed-data premises **flagged** (X3 — no config/migration fetch in Phase 1); `ExchangePublicTokenRequest` and the route group are fetch-type only if named in the diff | Flag texts present and attributed; no dedicated config resolver invoked |
-| `experiment-04` | `PlaidClient::createLinkToken` slice; `PlaidItemStatus` enum slice; call sites of `reactivate(` under `app/` | Reverse-caller item present with call-site provenance; no false extra fetches on the clean parts |
+| `experiment-03` | `flag-satisfied`: cache-store, schema-index and trashed-data premises (X3 — no config/migration fetch in Phase 1), each fired by its trigger in [ADR-A009](decisions/ADR-A009-premise-catalogue.md). `fetch-expected`: `ExchangePublicTokenRequest` and the route group only if named in the diff | Flag texts present and attributed; no dedicated config resolver invoked |
+| `experiment-04` | `fetch-expected`: `PlaidClient::createLinkToken` slice; `PlaidItemStatus` enum slice; call sites of `reactivate(` under `app/` (a real signature change, so the grep runs here) | Reverse-caller item present with call-site provenance; no false extra fetches on the clean parts; **no premise emitted** — this fixture is the precision guard for the transaction trigger |
 
 Two properties are asserted for every fixture: **determinism** (two runs, byte-identical output — which is why `filesUnder()` and call sites are lexicographically ordered)
 and **budget honesty** (`used_tokens ≤ budget_tokens`, and every omission appears in `dropped[]`).
@@ -47,6 +55,8 @@ a real filesystem. The tests worth naming up front, because they encode the evid
 | `BundleItemTest` | Constructing an item without a reason or a lever is rejected (P5) |
 | `BudgetEnforcerTest` | Over-budget drops follow the `ItemPriority` order stated in [01-architecture §3.4](01-architecture.md), and every drop is recorded (P7) |
 | `AssumptionWriterTest` | One statement per catalogue premise; an unknown premise is impossible to construct (A009) |
+| `UnverifiablePremiseAssertionExtractorTest` | One case per trigger in [ADR-A009](decisions/ADR-A009-premise-catalogue.md): each trigger present ⇒ exactly one premise; each trigger absent ⇒ none. Experiment 2's trace-logging shape yields zero premises |
+| `CallerResolverTest` | The grep runs for `ChangedSignature` only; a transaction-style caller question produces a flag and performs no search |
 
 ## 3 · What is *not* tested, on purpose
 

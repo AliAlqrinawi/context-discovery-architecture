@@ -28,14 +28,16 @@ budget with a visible drop list. It does not review, judge, score, or call a mod
 | 6 | [06-acceptance.md](06-acceptance.md) | The acceptance test: bundles reproduced against the four Phase 0 keys |
 | 7 | [decisions/](decisions/) | ADR-A001…A009 — the architecture decisions, with evidence and rejected alternatives |
 | 8 | [evidence-gaps.md](evidence-gaps.md) | What the research repository does *not* settle, the architecture's response, and the eight recorded architectural assumptions |
-| 9 | [REVIEW-freeze-01.md](REVIEW-freeze-01.md) · [REVIEW-freeze-02.md](REVIEW-freeze-02.md) | The freeze review: findings, the corrections applied, and the freeze verdict |
+| 9 | [REVIEW-freeze-01.md](REVIEW-freeze-01.md) · [REVIEW-freeze-02.md](REVIEW-freeze-02.md) · [REVIEW-freeze-03.md](REVIEW-freeze-03.md) | The freeze reviews: findings, corrections applied, the freeze verdict, and the two implementation blockers closed |
 
 ## Status
 
-**Frozen** at [REVIEW-freeze-02.md](REVIEW-freeze-02.md). All fourteen corrections from
-[REVIEW-freeze-01.md](REVIEW-freeze-01.md) are applied: 5 ports (was 7), 25 classes, one CLI option
-and one schema field removed, four omissions closed, eight architectural assumptions recorded.
-Implementation may begin.
+**Implementation ready** at [REVIEW-freeze-03.md](REVIEW-freeze-03.md). Frozen at
+[REVIEW-freeze-02.md](REVIEW-freeze-02.md) — 5 ports (was 7), 25 classes, one CLI option and one
+schema field removed, fourteen corrections applied, eight architectural assumptions recorded. Freeze
+review 03 then closed the two implementation blockers: the premise recognition contract (one literal
+trigger per premise) and the acceptance/implementation inconsistency on Experiment 1's caller
+(`fetch-expected` vs `flag-satisfied`). No module, capability, or scope changed.
 
 ## Governing rules (inherited, not invented)
 

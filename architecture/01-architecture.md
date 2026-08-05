@@ -92,7 +92,7 @@ estimation perform no I/O and have one implementation each, so they are plain cl
 | `…\OwnFileAssertionExtractor` | Reads the changed file's own text: emits `SameFileSymbolAbsence` for a symbol used in the region but missing from the `use` block, and `NamedReference` (same-file) for sibling members the region calls. | R1; Exp 1 (missing `Log`, `upsertFromPlaid`) |
 | `…\NamedReferenceAssertionExtractor` | Emits `NamedReference` for classes/members the region names and that are not defined locally — model, client method, enum. Depth one; **does not** follow the resolved file's own references (P3). | R2; Exp 1, 4 |
 | `…\ChangedSignatureAssertionExtractor` | Compares old/new signatures of members touched by the diff; emits `ChangedSignature` when arity or parameter shape changed. | R3; Exp 4 (`reactivate`) |
-| `…\UnverifiablePremiseAssertionExtractor` | Emits `UnverifiablePremise` from a **closed, evidence-derived catalogue** of premises a file cannot settle: surrounding-transaction, atomic-lock-store, schema-index-support, data-state-after-behaviour-change. Adding a premise requires a new experiment. | R5; Exp 1, 3 |
+| `…\UnverifiablePremiseAssertionExtractor` | Emits `UnverifiablePremise` from a **closed, evidence-derived catalogue** of premises a file cannot settle: surrounding-transaction, atomic-lock-store, schema-index-support, data-state-after-behaviour-change. Each has a single literal **trigger** — a premise is emitted if and only if its trigger is present ([ADR-A009](decisions/ADR-A009-premise-catalogue.md)); there is no inference path. Adding a premise, or a trigger, requires a new experiment. | R5; Exp 1, 3 |
 | `Discovery\Lever\LeverPolicy` | One pure function implementing `fetch-vs-flag.md`'s decision rule: named + single + depth-one on disk → `Fetched`; expensive (reverse-graph) or unknowable (runtime/data) → `Flagged`. No heuristics beyond that rule. | R5, P2 |
 | `Discovery\Resolution\OwnFileResolver` | Fetches the region's own `use` block, the enclosing member, and named sibling members. | R1 |
 | `Discovery\Resolution\NamedReferenceResolver` | Locates the class (`ClassLocator`), slices the single named member or the model/enum surface (`MemberSlicer`). Unresolved → returns nothing and hands the assertion back for flagging (P10). | R2 |
@@ -112,6 +112,23 @@ produces **no** assertion — no inference, no guessing (ADR-A003).
 | A class name in a `new`, type, or static-call position, resolved through the `use` block | `PlaidAccount` model surface | Exp 1 |
 
 Resolution is depth one: the resolved file's own references are never read (P3, P4).
+
+#### Premise triggers
+
+The parallel closed list for `UnverifiablePremise` — six premises, one literal trigger each — is
+specified in [ADR-A009](decisions/ADR-A009-premise-catalogue.md). Two properties matter
+architecturally: every trigger reads only the changed region and the changed file's own text (R1's
+existing load, no new input), and nothing outside the list can produce a premise. That is what keeps
+Experiment 2's bundle almost empty — no trigger fires on it — and what makes Experiment 4 the
+precision guard for the transaction trigger.
+
+#### The caller is fetched only for a changed signature
+
+`CallerResolver` runs for `ChangedSignature` assertions and nothing else. A caller question that is
+*not* a signature change — Experiment 1's "is this wrapped in a transaction?" — is **flagged**, never
+searched: `fetch-vs-flag.md` names it the canonical flag case, and the implementation spec's success
+criteria count "flags as a catch for the flag-type findings (e.g. the transaction assumption)". The
+acceptance expectations mark items accordingly ([06-acceptance.md](06-acceptance.md) §1).
 
 ### 3.4 Assembly
 
