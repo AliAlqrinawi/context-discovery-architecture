@@ -28,11 +28,13 @@ budget with a visible drop list. It does not review, judge, score, or call a mod
 | 6 | [06-acceptance.md](06-acceptance.md) | The acceptance test: bundles reproduced against the four Phase 0 keys |
 | 7 | [decisions/](decisions/) | ADR-A001…A009 — the architecture decisions, with evidence and rejected alternatives |
 | 8 | [evidence-gaps.md](evidence-gaps.md) | What the research repository does *not* settle, the architecture's response, and the eight recorded architectural assumptions |
-| 9 | [REVIEW-freeze-01.md](REVIEW-freeze-01.md) · [REVIEW-freeze-02.md](REVIEW-freeze-02.md) · [REVIEW-freeze-03.md](REVIEW-freeze-03.md) | The freeze reviews: findings, corrections applied, the freeze verdict, and the two implementation blockers closed |
+| 9 | [REVIEW-freeze-01.md](REVIEW-freeze-01.md) · [02](REVIEW-freeze-02.md) · [03](REVIEW-freeze-03.md) · [04](REVIEW-freeze-04.md) | The freeze reviews: findings, corrections applied, the freeze verdict, the two implementation blockers closed, and the ACP-01 patch |
 
 ## Status
 
-**Implementation ready** at [REVIEW-freeze-03.md](REVIEW-freeze-03.md). Frozen at
+**Implementation ready** at [REVIEW-freeze-04.md](REVIEW-freeze-04.md) — patch: one `AssertionKind`
+case (`SameFileReference`) so the five kinds partition the five moves one-to-one, plus one provenance
+clarification. Previously implementation-ready at [REVIEW-freeze-03.md](REVIEW-freeze-03.md). Frozen at
 [REVIEW-freeze-02.md](REVIEW-freeze-02.md) — 5 ports (was 7), 25 classes, one CLI option and one
 schema field removed, fourteen corrections applied, eight architectural assumptions recorded. Freeze
 review 03 then closed the two implementation blockers: the premise recognition contract (one literal

@@ -61,7 +61,6 @@ context-discover --diff <path|-> --repo <path> --budget <int>
       "assertion_kind": "unverifiable_premise",
       "provenance": {
         "path": "app/Services/Plaid/PlaidAccountService.php",
-        "member": "syncFromResponse",
         "lines": [120, 168]
       },
       "payload": "ASSUMPTION: this code assumes a surrounding transaction; caller not checked",
@@ -78,13 +77,13 @@ context-discover --diff <path|-> --repo <path> --budget <int>
 
 | Field | Rule |
 |---|---|
-| `bundle_version` | Integer. Bumped on any breaking change to this schema |
+| `bundle_version` | Integer, stays `1`. Bumped on any breaking change to this schema. Adding an `assertion_kind` value is additive, and no bundle has been emitted by a working tool, so v1 was never published to break (freeze review 04) |
 | `budget_tokens` | Echoes `--budget` |
 | `used_tokens` | Sum of `items[].tokens`; always ≤ `budget_tokens` |
 | `items[].lever` | `fetched` \| `flagged`. Required (P5) |
 | `items[].reason` | Non-empty string naming the reference or assumption resolved. Required — an item without one is a defect, not a warning (P5) |
-| `items[].assertion_kind` | `same_file_symbol_absence` \| `named_reference` \| `changed_signature` \| `unverifiable_premise`. Present so precision can be measured **per move** after the scored run |
-| `items[].provenance` | `path`, optional `member`, optional `lines` — enough for a human to verify the slice by hand |
+| `items[].assertion_kind` | `same_file_symbol_absence` \| `same_file_reference` \| `named_reference` \| `changed_signature` \| `unverifiable_premise`. One value per discovery move, so precision can be measured **per move** after the scored run — and so `ItemPriority` can band an item from this field alone |
+| `items[].provenance` | `path`, optional `member`, optional `lines` — enough for a human to verify the slice by hand. A fetched item carries `member` whenever the slice is one; a flagged item carries it only when the failing assertion named one ([ADR-A009](decisions/ADR-A009-premise-catalogue.md)) |
 | `items[].payload` | Fetched: the minimal source slice. Flagged: the assumption sentence, nothing else |
 | `dropped[]` | Every budget drop, with its reason. Empty array when nothing was dropped. Never omitted (P7) |
 
@@ -92,7 +91,8 @@ Unresolved references, unreadable paths and missing PSR-4 entries go to **stderr
 produces a flag item (ADR-A009), so nothing in the bundle depends on the diagnostic stream.
 
 **Ordering** (fixed, so output is diffable): items sorted by `assertion_kind` in the order
-`same_file_symbol_absence`, `changed_signature`, `named_reference`, `unverifiable_premise`, then by
+`same_file_symbol_absence`, `same_file_reference`, `changed_signature`, `named_reference`,
+`unverifiable_premise`, then by
 `provenance.path`, then by `provenance.member`. Drops keep the order in which they were dropped.
 
 **Markdown format** — same information, human-readable, one `##` heading per item carrying lever,
@@ -147,6 +147,13 @@ interface RegionAssertionExtractor {               // implemented by the four ex
 final class LeverPolicy {
     public function leverFor(Assertion $assertion, ClassLocator $locator): Lever;
 }
+
+// Resolver dispatch is an explicit match on AssertionKind in Pipeline\DiscoverContext:
+//   SameFileSymbolAbsence, SameFileReference → OwnFileResolver
+//   NamedReference                          → NamedReferenceResolver
+//   ChangedSignature                        → CallerResolver
+//   UnverifiablePremise                     → AssumptionWriter (flag; never resolved)
+// Every kind has exactly one destination; no probing, no fall-through.
 
 interface AssertionResolver {                     // OwnFile / NamedReference / Caller
     /** @return list<SourceSlice> empty list ⇒ caller must flag instead (P10) */

@@ -19,7 +19,7 @@ Exactly four assertion extractors and three resolvers exist, constructed explici
 
 | Extractor | Assertion kind | Move | Evidence |
 |---|---|---|---|
-| `OwnFileAssertionExtractor` | `SameFileSymbolAbsence`, same-file `NamedReference` | read-own-file | Exp 1 |
+| `OwnFileAssertionExtractor` | `SameFileSymbolAbsence`, `SameFileReference` | read-own-file | Exp 1 |
 | `NamedReferenceAssertionExtractor` | `NamedReference` | fetch-collaborator, depth one | Exp 1, 4 |
 | `ChangedSignatureAssertionExtractor` | `ChangedSignature` | reverse-caller | Exp 1, 4 |
 | `UnverifiablePremiseAssertionExtractor` | `UnverifiablePremise` | return-empty / flag | Exp 1, 2, 3 |
@@ -29,7 +29,14 @@ Resolvers: `OwnFileResolver`, `NamedReferenceResolver`, `CallerResolver`. The sh
 there is no registry, no discovery, no configuration file, and no way to add an implementation
 without editing `Wiring` and this ADR.
 
-Dispatch is an explicit `match` on `AssertionKind` in `Pipeline\DiscoverContext`. An earlier draft
+Dispatch is an explicit `match` on `AssertionKind` in `Pipeline\DiscoverContext`, and every kind has
+exactly one destination. That holds because the kinds partition the **moves** one-to-one: at freeze
+review 04 the single `NamedReference` kind was split into `SameFileReference` (research context type 1,
+read-own-file) and `NamedReference` (type 2, fetch-collaborator), which two extractors and two
+resolvers had been sharing. Five kinds, five moves — still four extractors and three resolvers, a
+re-partition of existing output rather than a new move, so this ADR's four-step gate is not triggered.
+The cross-file forms table in `01-architecture.md` §3.3 consequently holds **three** rows, not four:
+the fourth was the same-file sibling, which moved to `SameFileReference`. An earlier draft
 gave `AssertionResolver` a `supports()` probe; it was removed at the freeze review because runtime
 probing over a closed set hides the set from the reader and is the exact seam a plugin registry
 grows from.

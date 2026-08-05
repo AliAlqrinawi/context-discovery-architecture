@@ -65,7 +65,7 @@ inward only ([02-project-structure.md](02-project-structure.md) §4).
 | Module | Responsibility | Traces to |
 |---|---|---|
 | `Domain\Diff` | Immutable value types: `Diff`, `ChangedFile`, `ChangedRegion`, `ChangedMember` (name + old/new signature). Knows nothing about diff *text*. | R1 |
-| `Domain\Assertion` | `Assertion` (kind, subject, origin region, human-readable claim) and `AssertionKind`: `SameFileSymbolAbsence`, `NamedReference`, `ChangedSignature`, `UnverifiablePremise`. The core domain concept — the diff's *claims*, not its files. Plus `ResolvedAssertion` — assertion + lever + either slices or a statement — the single value handed from resolution to assembly. | P1, ADR-002 |
+| `Domain\Assertion` | `Assertion` (kind, subject, origin region, human-readable claim) and `AssertionKind`: `SameFileSymbolAbsence`, `SameFileReference`, `NamedReference`, `ChangedSignature`, `UnverifiablePremise` — one kind per move, so a kind always names its resolver and its priority band. The core domain concept — the diff's *claims*, not its files. Plus `ResolvedAssertion` — assertion + lever + either slices or a statement — the single value handed from resolution to assembly. | P1, ADR-002 |
 | `Domain\Bundle` | `Bundle` (ordered items, budget, used tokens, drops), `BundleItem` (payload, reason, lever, provenance), `Lever` enum (`Fetched`\|`Flagged`), `Provenance` (path, member, line span), `DroppedItem` (reason, note). Enforces the invariant: **no item without a reason and a lever**. | R4, P5 |
 | `Domain\Source` | `SourceSlice` (path, member, line span, text) — the minimal fetched payload. | R2 |
 
@@ -89,8 +89,8 @@ estimation perform no I/O and have one implementation each, so they are plain cl
 |---|---|---|
 | `Discovery\Parsing\UnifiedDiffParser` | Unified diff text → `Domain\Diff`. A pure class, not a port: no I/O, one implementation. Old signatures come from the hunk's removed lines; a rename is treated as two members and is not tracked. | R1 |
 | `Discovery\Extraction\AssertionExtractor` | Facade. Runs the four extractors over every changed region in a fixed order and returns a deterministic, de-duplicated `Assertion[]`. | spec resp. 3 |
-| `…\OwnFileAssertionExtractor` | Reads the changed file's own text: emits `SameFileSymbolAbsence` for a symbol used in the region but missing from the `use` block, and `NamedReference` (same-file) for sibling members the region calls. | R1; Exp 1 (missing `Log`, `upsertFromPlaid`) |
-| `…\NamedReferenceAssertionExtractor` | Emits `NamedReference` for classes/members the region names and that are not defined locally — model, client method, enum. Depth one; **does not** follow the resolved file's own references (P3). | R2; Exp 1, 4 |
+| `…\OwnFileAssertionExtractor` | Reads the changed file's own text: emits `SameFileSymbolAbsence` for a symbol used in the region but missing from the `use` block, and `SameFileReference` for sibling members the region calls (`$this->method(`). | R1; Exp 1 (missing `Log`, `upsertFromPlaid`) |
+| `…\NamedReferenceAssertionExtractor` | Emits `NamedReference` for classes/members the region names and that are **not** defined in the changed file — model, client method, enum. Same-file siblings belong to `OwnFileAssertionExtractor`. Depth one; **does not** follow the resolved file's own references (P3). | R2; Exp 1, 4 |
 | `…\ChangedSignatureAssertionExtractor` | Compares old/new signatures of members touched by the diff; emits `ChangedSignature` when arity or parameter shape changed. | R3; Exp 4 (`reactivate`) |
 | `…\UnverifiablePremiseAssertionExtractor` | Emits `UnverifiablePremise` from a **closed, evidence-derived catalogue** of premises a file cannot settle: surrounding-transaction, atomic-lock-store, schema-index-support, data-state-after-behaviour-change. Each has a single literal **trigger** — a premise is emitted if and only if its trigger is present ([ADR-A009](decisions/ADR-A009-premise-catalogue.md)); there is no inference path. Adding a premise, or a trigger, requires a new experiment. | R5; Exp 1, 3 |
 | `Discovery\Lever\LeverPolicy` | One pure function implementing `fetch-vs-flag.md`'s decision rule: named + single + depth-one on disk → `Fetched`; expensive (reverse-graph) or unknowable (runtime/data) → `Flagged`. No heuristics beyond that rule. | R5, P2 |
@@ -101,14 +101,16 @@ estimation perform no I/O and have one implementation each, so they are plain cl
 
 #### Reference forms recognised by `NamedReferenceAssertionExtractor`
 
-R2's recall is defined by this closed list. Each form is required by a finding; any other form
+R2's recall is defined by this closed list — the **cross-file** forms only. A reference to a member of
+the changed file itself (`$this->method(`, e.g. Exp 1's `upsertFromPlaid`) is a `SameFileReference`
+emitted by `OwnFileAssertionExtractor`: research context type 1, not type 2
+(`docs/02-discovery/context-types.md`). Each form below is required by a finding; any other form
 produces **no** assertion — no inference, no guessing (ADR-A003).
 
 | Form | Example from the evidence | Earned by |
 |---|---|---|
 | `Name::member` — static or enum member access | `PlaidItemStatus::REVOKED` | Exp 4 |
 | `$property->method(` where the property's declared type resolves through the file's `use` block | `$this->plaidClient->createLinkToken(` | Exp 4 |
-| `$this->method(` — same-class sibling | `upsertFromPlaid` | Exp 1 |
 | A class name in a `new`, type, or static-call position, resolved through the `use` block | `PlaidAccount` model surface | Exp 1 |
 
 Resolution is depth one: the resolved file's own references are never read (P3, P4).
@@ -141,14 +143,16 @@ acceptance expectations mark items accordingly ([06-acceptance.md](06-acceptance
 #### `ItemPriority` — the drop order
 
 Used **only** by `BudgetEnforcer`, and only for dropping. It is not a relevance signal (P6, X4).
-Priority 1 is never dropped; priority 4 is dropped first.
+Priority 1 is never dropped; priority 4 is dropped first. The bands are expressed in `AssertionKind`
+and `Lever` — two fields a `BundleItem` already carries — so the enforcer needs no knowledge of which
+resolver produced an item (freeze review 04).
 
 | Priority | Items | Why here |
 |---|---|---|
-| 1 · never dropped | Flagged items | Cost is near-zero, and a silent omission is indistinguishable from "nothing needed" (P10, `fetch-vs-flag.md`) |
-| 2 | Own-file slices (`use` block, enclosing member, named siblings) | Free on disk, the substrate every other move builds on (R1, Exp 1) |
-| 3 | Changed-signature call sites | The recurring high-severity move and the sharpest A-vs-C differential (R3, Exp 1, 4) |
-| 4 · dropped first | Named-reference slices | Valuable and cheap, but the move Exp 2 shows must never be pulled speculatively |
+| 1 · never dropped | Flagged items, any kind | Cost is near-zero, and a silent omission is indistinguishable from "nothing needed" (P10, `fetch-vs-flag.md`) |
+| 2 | `SameFileSymbolAbsence` + `SameFileReference` slices — `use` block, enclosing member, named siblings | Free on disk, the substrate every other move builds on (R1, Exp 1) |
+| 3 | `ChangedSignature` call sites | The recurring high-severity move and the sharpest A-vs-C differential (R3, Exp 1, 4) |
+| 4 · dropped first | `NamedReference` slices — cross-file only | Valuable and cheap, but the move Exp 2 shows must never be pulled speculatively |
 
 Within a priority band, the largest estimated item is dropped first, so the fewest items are lost.
 
@@ -168,7 +172,7 @@ Within a priority band, the largest estimated item is dropped first, so the fewe
 |---|---|
 | `Cli\Options` | Parse and validate argv. `--budget` is **required** — the research fixes no number ([ADR-A008](decisions/ADR-A008-required-budget.md)). |
 | `Cli\Wiring` | Plain constructor wiring. No container library, no service locator, no auto-discovery. |
-| `Cli\DiscoverCommand` | Runs `Pipeline\DiscoverContext`, writes the bundle to stdout or `--out`, diagnostics to stderr, returns an exit code. |
+| `Cli\DiscoverCommand` | Runs `Pipeline\DiscoverContext`, writes the bundle to stdout, diagnostics to stderr, returns an exit code. |
 | `Pipeline\DiscoverContext` | The single use case. Nine stages, fixed order, no branching on configuration beyond scope/budget. |
 
 **Module count: 25 classes + 5 interfaces.** Anything larger would be Phase 2 leaking in.
@@ -187,7 +191,7 @@ Fixed order; each arrow is a value, not an event (no bus, no listeners — [ADR-
 5c resolution failure ─▶ back to 5b as a flag                                       (P10)
 6  (slices, flags) ─▶ BundleAssembler ─▶ Bundle{BundleItem[] with reason+lever+provenance}
 7  Bundle ─▶ TokenEstimate + BudgetEnforcer ─▶ Bundle{used_tokens, dropped[]}
-8  Bundle ─▶ JsonBundleWriter | MarkdownBundleWriter ─▶ stdout | --out
+8  Bundle ─▶ JsonBundleWriter | MarkdownBundleWriter ─▶ stdout
 ```
 
 Two properties hold by construction:

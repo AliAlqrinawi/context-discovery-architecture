@@ -7,7 +7,7 @@ added to it, that is the signal to stop.
 
 | Req (research) | Capability | Modules that implement it | Experiment(s) |
 |---|---|---|---|
-| **R1** | Diff parsing + full changed-file load | `Discovery\Parsing\UnifiedDiffParser`, `Adapters\Filesystem\LocalSourceRepository`, `Domain\Diff\*`, `Discovery\Extraction\OwnFileAssertionExtractor`, `Discovery\Resolution\OwnFileResolver` | 1 |
+| **R1** | Diff parsing + full changed-file load | `Discovery\Parsing\UnifiedDiffParser`, `Adapters\Filesystem\LocalSourceRepository`, `Domain\Diff\*`, `Discovery\Extraction\OwnFileAssertionExtractor` (`SameFileSymbolAbsence`, `SameFileReference`), `Discovery\Resolution\OwnFileResolver` | 1 |
 | **R2** | Depth-one named-reference resolution via PSR-4, minimal slice | `Discovery\Extraction\NamedReferenceAssertionExtractor`, `Discovery\Resolution\NamedReferenceResolver`, `Adapters\Autoload\ComposerPsr4ClassLocator`, `Adapters\Php\TokenizerMemberSlicer` | 1, 4 |
 | **R3** | Reverse-caller lookup for changed signatures (grep) | `Discovery\Extraction\ChangedSignatureAssertionExtractor`, `Discovery\Resolution\CallerResolver`, `Adapters\Search\ScopedGrepCallSiteSearch`. Signature changes only (Exp 4); a caller question that is not a signature change — Exp 1's transaction — is flag-type per `fetch-vs-flag.md` and counts as a catch per the spec's success criteria | 1, 4 |
 | **R4** | Bundle with reason + lever per item, token accounting | `Domain\Bundle\*`, `Assembly\BundleAssembler`, `Assembly\TokenEstimate`, `Adapters\Serialization\*` | method; 1, 3 |
@@ -17,8 +17,8 @@ added to it, that is the signal to stop.
 
 | Move (`docs/02-discovery/discovery-moves.md`) | Lever | Module | Earned by |
 |---|---|---|---|
-| Read the changed file's own surroundings | Fetch | `OwnFileAssertionExtractor` + `OwnFileResolver` | Exp 1 — missing `Log` import; `upsertFromPlaid` sibling |
-| Fetch a named collaborator / model / enum (depth one) | Fetch | `NamedReferenceAssertionExtractor` + `NamedReferenceResolver` | Exp 1 — `PlaidAccount`; Exp 4 — `PlaidClient::createLinkToken`, `PlaidItemStatus` |
+| Read the changed file's own surroundings | Fetch | `OwnFileAssertionExtractor` + `OwnFileResolver`; kinds `SameFileSymbolAbsence`, `SameFileReference` | Exp 1 — missing `Log` import; `upsertFromPlaid` sibling |
+| Fetch a named collaborator / model / enum (depth one) | Fetch | `NamedReferenceAssertionExtractor` + `NamedReferenceResolver`; kind `NamedReference`, cross-file only | Exp 1 — `PlaidAccount`; Exp 4 — `PlaidClient::createLinkToken`, `PlaidItemStatus` |
 | Reverse-caller lookup | Fetch (bounded) / Flag (deep) | `ChangedSignatureAssertionExtractor` + `CallerResolver` for a changed signature; the deep case (Exp 1's transaction) → `surrounding-transaction` premise, never a search | Exp 1 — transaction (flag-type); Exp 4 — `reactivate` signature (fetch-type) |
 | Fetch config / migration | **Flag only in Phase 1** | `PremiseCatalogue` (`atomic-lock-store`, `schema-index-support`, `data-state-after-behaviour-change`) | Exp 3 — n=1, so X3 defers the resolver |
 | Return empty / flag rather than fetch | Flag / nothing | `LeverPolicy`, `AssumptionWriter`, and the *absence* of speculative fetching | Exp 1, 2, 3 |
@@ -28,8 +28,8 @@ added to it, that is the signal to stop.
 
 | Type (`docs/02-discovery/context-types.md`) | Phase 1 handling | Module |
 |---|---|---|
-| 1 · Same-file | Fetch | `OwnFileResolver` |
-| 2 · Named collaborator (depth 1) | Fetch | `NamedReferenceResolver` |
+| 1 · Same-file | Fetch | `OwnFileResolver` — kinds `SameFileSymbolAbsence`, `SameFileReference` |
+| 2 · Named collaborator (depth 1) | Fetch | `NamedReferenceResolver` — kind `NamedReference` |
 | 3 · Caller | Fetch bounded grep; flag the deep question | `CallerResolver`; `AssumptionWriter` |
 | 4 · Schema (migrations) | **Flag** (X3) | `PremiseCatalogue.schema-index-support`, `.data-state-after-behaviour-change` |
 | 5 · Configuration | **Flag** (X3) | `PremiseCatalogue.atomic-lock-store` |
@@ -39,7 +39,7 @@ added to it, that is the signal to stop.
 
 | Principle | How the architecture guarantees it (not "remembers" it) |
 |---|---|
-| P1 assertion-resolution | `Domain\Assertion` is the only type the pipeline's middle stages accept; there is no "related files" type anywhere |
+| P1 assertion-resolution | `Domain\Assertion` is the only type the pipeline's middle stages accept; there is no "related files" type anywhere. The five kinds partition the five moves one-to-one, so a kind names its resolver and its drop band with no extra field |
 | P2 two levers | `LeverPolicy` is the single decision point; `Lever` is a required field on every item |
 | P3 depth one | Resolved slices are payload; stage 5 has no path back to stage 3 |
 | P4 no forward-following | No module reads a resolved file's own `use` block; `ImportFollower` does not exist |

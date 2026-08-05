@@ -28,7 +28,7 @@
       <span style="padding: 4px 9px; background: #1b1a17; color: #f7f5f1;">Architecture repository</span>
       <span style="padding: 4px 9px; border: 1px solid #cfc9bd; color: #6b675f;">Phase 1 · specified, not built</span>
       <span style="padding: 4px 9px; border: 1px solid #cfc9bd; color: #6b675f;">No implementation code</span>
-      <span style="padding: 4px 9px; background: #2f5fb0; color: #fffefb;">Implementation ready · freeze review 03</span>
+      <span style="padding: 4px 9px; background: #2f5fb0; color: #fffefb;">Implementation ready · freeze review 04</span>
       <span style="padding: 4px 9px; border: 1px solid #cfc9bd; color: #6b675f;">Source: AliAlqrinawi/context-discovery-research @ main</span>
     </div>
     <h1 style="margin: 0; font-family: 'Newsreader', serif; font-weight: 500; font-size: 56px; line-height: 1.06; letter-spacing: -0.02em;">Context Discovery · Phase&nbsp;1<br><span style="color: #6b675f;">production architecture</span></h1>
@@ -138,7 +138,7 @@
         </div>
         <div style="display: grid; grid-template-columns: 1.1fr 2fr 0.5fr; gap: 2px;">
           <div style="background: #fffefb; padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">Domain\Assertion</div>
-          <div style="background: #fffefb; padding: 12px 14px; font-size: 15px;">The core concept: what the diff claims but cannot prove. Four kinds — <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">SameFileSymbolAbsence · NamedReference · ChangedSignature · UnverifiablePremise</span>.</div>
+          <div style="background: #fffefb; padding: 12px 14px; font-size: 15px;">The core concept: what the diff claims but cannot prove. Five kinds — <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">SameFileSymbolAbsence · SameFileReference · NamedReference · ChangedSignature · UnverifiablePremise</span> — one per discovery move, so a kind names its resolver and its drop band.</div>
           <div style="background: #fffefb; padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #2f5fb0;">P1 · ADR-002</div>
         </div>
         <div style="display: grid; grid-template-columns: 1.1fr 2fr 0.5fr; gap: 2px;">
@@ -153,7 +153,7 @@
         </div>
         <div style="display: grid; grid-template-columns: 1.1fr 2fr 0.5fr; gap: 2px;">
           <div style="background: #fffefb; padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">Discovery\Extraction</div>
-          <div style="background: #fffefb; padding: 12px 14px; font-size: 15px;">Four extractors, one per validated move: own-file (absences + siblings), named reference (four recognised forms), changed signature, unverifiable premise (six premises, one literal trigger each) — every form and trigger earned by an experiment. Fixed order, de-duplicated, deterministic.</div>
+          <div style="background: #fffefb; padding: 12px 14px; font-size: 15px;">Four extractors, one per validated move: own-file (absences + siblings), named reference (three recognised cross-file forms), changed signature, unverifiable premise (six premises, one literal trigger each) — every form and trigger earned by an experiment. Fixed order, de-duplicated, deterministic.</div>
           <div style="background: #fffefb; padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #2f5fb0;">R1 R2 R3 R5</div>
         </div>
         <div style="display: grid; grid-template-columns: 1.1fr 2fr 0.5fr; gap: 2px;">
@@ -173,7 +173,7 @@
         </div>
         <div style="display: grid; grid-template-columns: 1.1fr 2fr 0.5fr; gap: 2px;">
           <div style="background: #fffefb; padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">Assembly</div>
-          <div style="background: #fffefb; padding: 12px 14px; font-size: 15px;">Assembler (rejects any item lacking a reason) · pure token estimate · fixed drop priority — not a relevance score: flags are never dropped, named-reference slices go first · budget enforcer that records every drop.</div>
+          <div style="background: #fffefb; padding: 12px 14px; font-size: 15px;">Assembler (rejects any item lacking a reason) · pure token estimate · fixed drop priority — not a relevance score, banded from <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">assertion_kind</span> + <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">lever</span> alone: flags never dropped, cross-file named-reference slices first · budget enforcer that records every drop.</div>
           <div style="background: #fffefb; padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #2f5fb0;">R4 · P7</div>
         </div>
         <div style="display: grid; grid-template-columns: 1.1fr 2fr 0.5fr; gap: 2px;">
@@ -228,14 +228,14 @@
     { "lever": "flagged",
       "reason": "reconciliation assumes a surrounding DB transaction; caller not verified",
       "assertion_kind": "unverifiable_premise",
-      "provenance": { "path": "app/Services/Plaid/PlaidAccountService.php", "member": "syncFromResponse" },
+      "provenance": { "path": "app/Services/Plaid/PlaidAccountService.php", "lines": [120, 168] },
       "payload": "ASSUMPTION: this code assumes a surrounding transaction; caller not checked",
       "tokens": 14 }
   ],
   "dropped": [ { "reason": "route wiring for reauth endpoint", "note": "below budget priority" } ]
 }</pre>
       </div>
-      <p style="margin: 0; font-size: 15px; color: #6b675f;">Item order is fixed so output is diffable: absence → changed signature → named reference → premise, then path, then member. <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">assertion_kind</span> exists so precision can later be measured <em>per move</em>. Port and collaborator signatures: <a href="architecture/03-interfaces.md">03-interfaces.md</a>.</p>
+      <p style="margin: 0; font-size: 15px; color: #6b675f;">Item order is fixed so output is diffable: absence → same-file reference → changed signature → named reference → premise, then path, then member. <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">assertion_kind</span> exists so precision can later be measured <em>per move</em>. Port and collaborator signatures: <a href="architecture/03-interfaces.md">03-interfaces.md</a>.</p>
     </div>
   </section>
 
@@ -256,6 +256,7 @@
 │   ├── Domain/
 │   │   ├── Diff/              Diff · ChangedFile · ChangedRegion
 │   │   ├── Assertion/         Assertion · AssertionKind
+│   │   │                      ResolvedAssertion
 │   │   ├── Bundle/            Bundle · BundleItem · Lever
 │   │   └── Source/            SourceSlice · CallSite
 │   ├── Ports/                 5 interfaces
@@ -363,7 +364,7 @@
         <div style="display: grid; grid-template-columns: 34px 210px 1fr; gap: 14px; padding: 11px 0; border-bottom: 1px dotted #e0dcd3; align-items: baseline;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #a09a8e;">06</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">Resolvers</span><span style="font-size: 15px;">Dispatched by an explicit <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">match</span> on assertion kind — no probing. Own-file · named reference · caller grep &rarr; minimal slices. An empty result, an unreadable path or a truncated search falls through to a flag.</span></div>
         <div style="display: grid; grid-template-columns: 34px 210px 1fr; gap: 14px; padding: 11px 0; border-bottom: 1px dotted #e0dcd3; align-items: baseline;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #a09a8e;">07</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">AssumptionWriter</span><span style="font-size: 15px;">One fixed statement per catalogue premise, with its reason and provenance.</span></div>
         <div style="display: grid; grid-template-columns: 34px 210px 1fr; gap: 14px; padding: 11px 0; border-bottom: 1px dotted #e0dcd3; align-items: baseline;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #a09a8e;">08</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">BundleAssembler → Budget</span><span style="font-size: 15px;">Items get reason, lever, provenance; over budget, the lowest-priority item is dropped and recorded.</span></div>
-        <div style="display: grid; grid-template-columns: 34px 210px 1fr; gap: 14px; padding: 11px 0; align-items: baseline;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #a09a8e;">09</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">BundleWriter</span><span style="font-size: 15px;">JSON or Markdown to stdout or <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">--out</span>; diagnostics to stderr; exit 0.</span></div>
+        <div style="display: grid; grid-template-columns: 34px 210px 1fr; gap: 14px; padding: 11px 0; align-items: baseline;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #a09a8e;">09</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">BundleWriter</span><span style="font-size: 15px;">JSON or Markdown to stdout; diagnostics to stderr; exit 0.</span></div>
         <p style="margin: 16px 0 0; font-size: 14px; color: #6b675f;">No step calls the network, spawns a process, writes into the repository, or returns to an earlier step.</p>
       </div>
     </div>
@@ -376,8 +377,8 @@
           <span style="font-family: 'IBM Plex Mono', monospace; color: #a09a8e;">↓</span>
           <div style="width: 100%; background: #1b1a17; color: #f7f5f1; padding: 11px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; text-align: center;">3 · extract assertions — what the diff claims but cannot prove</div>
           <div style="width: 100%; display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px;">
-            <div style="border: 1px solid #cfc9bd; background: #f7f5f1; padding: 12px; display: flex; flex-direction: column; gap: 6px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px;">SameFileSymbolAbsence<br>+ sibling reference</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #2f5fb0;">R1 · Exp 1</span></div>
-            <div style="border: 1px solid #cfc9bd; background: #f7f5f1; padding: 12px; display: flex; flex-direction: column; gap: 6px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px;">NamedReference<br>class · model · enum</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #2f5fb0;">R2 · Exp 1, 4</span></div>
+            <div style="border: 1px solid #cfc9bd; background: #f7f5f1; padding: 12px; display: flex; flex-direction: column; gap: 6px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px;">SameFileSymbolAbsence<br>+ SameFileReference</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #2f5fb0;">R1 · Exp 1</span></div>
+            <div style="border: 1px solid #cfc9bd; background: #f7f5f1; padding: 12px; display: flex; flex-direction: column; gap: 6px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px;">NamedReference<br>class · model · enum<br>cross-file only</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #2f5fb0;">R2 · Exp 1, 4</span></div>
             <div style="border: 1px solid #cfc9bd; background: #f7f5f1; padding: 12px; display: flex; flex-direction: column; gap: 6px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px;">ChangedSignature<br>arity · param shape</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #2f5fb0;">R3 · Exp 1, 4</span></div>
             <div style="border: 1px solid #cfc9bd; background: #f7f5f1; padding: 12px; display: flex; flex-direction: column; gap: 6px;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px;">UnverifiablePremise<br>closed catalogue,<br>one literal trigger each</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #2f5fb0;">R5 · Exp 1, 3</span></div>
           </div>
@@ -437,7 +438,7 @@
         <div style="display: grid; grid-template-columns: 110px 1fr; gap: 16px; align-items: center;"><span></span><span style="font-family: 'IBM Plex Mono', monospace; color: #a09a8e; font-size: 14px;">↓</span></div>
         <div style="display: grid; grid-template-columns: 110px 1fr; gap: 16px; align-items: center;">
           <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #a09a8e;">Domain</span>
-          <div style="border: 1px solid #1b1a17; background: #f7f5f1; padding: 11px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px;">Diff · Assertion (+ ResolvedAssertion) · Bundle · Source <span style="color: #6b675f;">— depends on nothing</span></div>
+          <div style="border: 1px solid #1b1a17; background: #f7f5f1; padding: 11px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px;">Diff · Assertion (5 kinds + ResolvedAssertion) · Bundle · Source <span style="color: #6b675f;">— depends on nothing</span></div>
         </div>
         <div style="margin-top: 8px; border-top: 1px dotted #e0dcd3; padding-top: 14px; display: grid; grid-template-columns: 110px 1fr; gap: 16px; align-items: center;">
           <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #a09a8e;">Adapters</span>
@@ -540,7 +541,7 @@
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px;">
       <div style="background: #fffefb; border: 1px solid #e0dcd3; padding: 18px 20px; display: flex; flex-direction: column; gap: 8px;">
         <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #6b675f;">experiment-01 · recall</span>
-        <span style="font-size: 15px;"><em>fetch-expected</em>: use block + <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">syncFromResponse</span>, the model surface, <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">upsertFromPlaid</span>. <em>flag-satisfied</em>: the caller — the transaction premise. No grep runs; no signature changed.</span>
+        <span style="font-size: 15px;"><em>fetch-expected</em>: use block + <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">syncFromResponse</span> (absence), <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">upsertFromPlaid</span> (same-file reference, band 2), the model surface (named reference, band 4). <em>flag-satisfied</em>: the caller — the transaction premise. No grep runs; no signature changed.</span>
       </div>
       <div style="background: #fffefb; border: 1px solid #e0dcd3; padding: 18px 20px; display: flex; flex-direction: column; gap: 8px;">
         <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #6b675f;">experiment-02 · precision</span>
@@ -561,7 +562,7 @@
 
   <footer style="border-top: 2px solid #1b1a17; padding-top: 24px; display: flex; flex-direction: column; gap: 10px;">
     <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; color: #6b675f;">Handoff</span>
-    <p style="margin: 0; max-width: 760px; font-size: 16px;">Implementable in the order of <a href="architecture/README.md">architecture/README.md</a>: verification, architecture, structure, interfaces, diagrams, traceability, acceptance, decisions. Every module appears in the traceability matrix with its requirement and its experiment — <a href="architecture/05-traceability.md">05-traceability.md</a>. If a future module cannot be added to that table, that is the signal to stop rather than to design. The freeze record — findings, the fourteen corrections applied, and the eight recorded architectural assumptions — is in <a href="architecture/REVIEW-freeze-01.md">REVIEW-freeze-01.md</a>, <a href="architecture/REVIEW-freeze-02.md">REVIEW-freeze-02.md</a> and <a href="architecture/REVIEW-freeze-03.md">REVIEW-freeze-03.md</a> — the last closing the premise recognition contract and the Experiment 1 acceptance inconsistency.</p>
+    <p style="margin: 0; max-width: 760px; font-size: 16px;">Implementable in the order of <a href="architecture/README.md">architecture/README.md</a>: verification, architecture, structure, interfaces, diagrams, traceability, acceptance, decisions. Every module appears in the traceability matrix with its requirement and its experiment — <a href="architecture/05-traceability.md">05-traceability.md</a>. If a future module cannot be added to that table, that is the signal to stop rather than to design. The freeze record — findings, the fourteen corrections applied, and the eight recorded architectural assumptions — is in <a href="architecture/REVIEW-freeze-01.md">REVIEW-freeze-01.md</a>, <a href="architecture/REVIEW-freeze-02.md">REVIEW-freeze-02.md</a> , <a href="architecture/REVIEW-freeze-03.md">REVIEW-freeze-03.md</a> and <a href="architecture/REVIEW-freeze-04.md">REVIEW-freeze-04.md</a> — the last two closing the premise recognition contract, the Experiment 1 acceptance inconsistency, and the ACP-01 kind/move partition.</p>
   </footer>
 
 </div>

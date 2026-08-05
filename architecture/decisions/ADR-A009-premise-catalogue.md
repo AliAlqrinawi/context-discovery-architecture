@@ -58,8 +58,13 @@ One fixed statement per premise:
 | `unresolved-reference` | "ASSUMPTION: named reference could not be resolved on disk; contract unverified" | P10 |
 | `call-sites-truncated` | "ASSUMPTION: additional call sites exist beyond the search bound; not all verified" | P10 / A006 |
 
-Each flag carries the reason (which assertion it resolves) and provenance (path, member). No flag
-is generated outside this list; there is no free-text or model-generated assumption path.
+Each flag carries the reason (which assertion it resolves) and provenance: the origin **path** and
+line span always, and a **member** only when the failing assertion already names one (e.g.
+`unresolved-reference` from a `NamedReference`). `Assertion` carries no enclosing-member name and the
+flag path has no slicer, so a member is never derived for a flag — the research asks only that the
+assumption be stated and attributed to its file (`fetch-vs-flag.md`), and `member` is optional in the
+schema. No flag is generated outside this list; there is no free-text or model-generated assumption
+path.
 
 ## Evidence from Phase 0
 

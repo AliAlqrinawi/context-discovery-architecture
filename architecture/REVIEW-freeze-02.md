@@ -19,7 +19,7 @@ against the current documents.
 | 6 | `Ports\DiffParser` deleted; parser is `Discovery\Parsing\UnifiedDiffParser` | `01-architecture.md` §3.2–3.3, §3.5, `02-…`, `03-…`, `05-…` R1 | ✔ `Adapters\Diff/` removed everywhere |
 | 7 | `Ports\TokenEstimator` deleted; `Assembly\TokenEstimate` | same set, `ADR-A007`, `05-…` R4 | ✔ `Adapters\Estimation/` removed everywhere |
 | 8 | `supports()` dropped; explicit `match` on `AssertionKind` | `03-interfaces.md` §4, `ADR-A003` | ✔ |
-| 9 | `--out` deleted | `03-interfaces.md` §1, `01-architecture.md` §5 | ✔ |
+| 9 | `--out` deleted | `03-interfaces.md` §1, `01-architecture.md` §5 | ✔ in those two places; **three residual mentions were missed** (`01-architecture.md` §3.6 and data-flow stage 8, and the request-flow step in the reviewable document) and were removed at freeze review 04 — see [REVIEW-freeze-04.md](REVIEW-freeze-04.md) §9 |
 | 10 | A007 formula removed; one named ratio constant; ratio recorded as AA4 | `ADR-A007`, `05-traceability` §6 | ✔ no expression remains |
 | 11 | `diagnostics[]` removed from the bundle schema | `03-interfaces.md` §2, review document sample | ✔ stderr-only, each with a flag item |
 | 12 | *Repository* naming clarified | `02-project-structure.md` §5, `03-interfaces.md` §5 | ✔ |
