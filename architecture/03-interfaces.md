@@ -32,6 +32,7 @@ context-discover --diff <path|-> --repo <path> --budget <int>
 - Read-only: the tool never writes inside `--repo`.
 - No network, no subprocess, no LLM, no state directory (P9, X5).
 - Diagnostics go to stderr only; the bundle on stdout is always parseable and carries no diagnostics.
+- A successful negative result is a diagnostic, not an item and not a flag (freeze review 05).
 - Exit codes: `0` bundle produced (including an empty bundle) · `1` usage or input error ·
   `2` repository unreadable.
 
@@ -89,6 +90,11 @@ context-discover --diff <path|-> --repo <path> --budget <int>
 
 Unresolved references, unreadable paths and missing PSR-4 entries go to **stderr** only. Each also
 produces a flag item (ADR-A009), so nothing in the bundle depends on the diagnostic stream.
+
+One diagnostic class has **no** corresponding item: a successful negative result — a caller search
+that completes with zero call sites, or a changed file with no `use` block. It is recorded on stderr
+(`caller search for reactivate( under app/: 0 call sites`) so the acceptance harness can tell "searched,
+found none" from "never searched"; it produces no bundle item and no flag (freeze review 05).
 
 **Ordering** (fixed, so output is diffable): items sorted by `assertion_kind` in the order
 `same_file_symbol_absence`, `same_file_reference`, `changed_signature`, `named_reference`,
@@ -156,7 +162,17 @@ final class LeverPolicy {
 // Every kind has exactly one destination; no probing, no fall-through.
 
 interface AssertionResolver {                     // OwnFile / NamedReference / Caller
-    /** @return list<SourceSlice> empty list ⇒ caller must flag instead (P10) */
+    /**
+     * @return list<SourceSlice> An empty list is one of TWO cases, distinguished by the
+     *   resolver, never by the pipeline:
+     *   (a) lookup FAILURE — the source should exist and could not be read (no PSR-4 entry,
+     *       unreadable path, member not found). Becomes a flag (P10).
+     *   (b) successful NEGATIVE — the question was answered and the answer is "none"
+     *       (a caller search that completes with zero call sites; a changed file with no
+     *       `use` block). No premise exists to state, so: no bundle item, one stderr
+     *       diagnostic. Emitting a flag here would assert an assumption that is not being
+     *       made — a precision failure (freeze review 05).
+     */
     public function resolve(Assertion $assertion): array;
 }
 

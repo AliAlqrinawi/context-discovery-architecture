@@ -96,7 +96,7 @@ estimation perform no I/O and have one implementation each, so they are plain cl
 | `Discovery\Lever\LeverPolicy` | One pure function implementing `fetch-vs-flag.md`'s decision rule: named + single + depth-one on disk → `Fetched`; expensive (reverse-graph) or unknowable (runtime/data) → `Flagged`. No heuristics beyond that rule. | R5, P2 |
 | `Discovery\Resolution\OwnFileResolver` | Fetches the region's own `use` block, the enclosing member, and named sibling members. | R1 |
 | `Discovery\Resolution\NamedReferenceResolver` | Locates the class (`ClassLocator`), slices the single named member or the model/enum surface (`MemberSlicer`). Unresolved → returns nothing and hands the assertion back for flagging (P10). | R2 |
-| `Discovery\Resolution\CallerResolver` | For a `ChangedSignature`, greps call sites within the configured scope and returns the matching lines. Bounded: scope prefix, max call sites, no recursion. | R3 |
+| `Discovery\Resolution\CallerResolver` | For a `ChangedSignature`, greps call sites within the configured scope and returns the matching lines. Bounded: scope prefix, max call sites, no recursion. A search that completes with **zero** call sites is a successful negative — no item, no flag, one stderr diagnostic (freeze review 05). | R3 |
 | `Discovery\Flagging\AssumptionWriter` | Renders one flagged assertion into a one-line `ASSUMPTION: …` payload plus its reason. Text templates only, one per catalogue premise. | R5 |
 
 #### Reference forms recognised by `NamedReferenceAssertionExtractor`
@@ -188,7 +188,8 @@ Fixed order; each arrow is a value, not an event (no bus, no listeners — [ADR-
 4  Assertion[] ─▶ LeverPolicy ─▶ (Assertion, Lever)[]
 5a Lever=Fetched  ─▶ OwnFileResolver | NamedReferenceResolver | CallerResolver ─▶ SourceSlice[]
 5b Lever=Flagged  ─▶ AssumptionWriter ─▶ assumption text
-5c resolution failure ─▶ back to 5b as a flag                                       (P10)
+5c resolution FAILURE (unreadable, unresolvable) ─▶ back to 5b as a flag            (P10)
+5d successful NEGATIVE (search ran, zero results) ─▶ no item; one stderr diagnostic
 6  (slices, flags) ─▶ BundleAssembler ─▶ Bundle{BundleItem[] with reason+lever+provenance}
 7  Bundle ─▶ TokenEstimate + BudgetEnforcer ─▶ Bundle{used_tokens, dropped[]}
 8  Bundle ─▶ JsonBundleWriter | MarkdownBundleWriter ─▶ stdout
@@ -200,6 +201,9 @@ Two properties hold by construction:
   slices that settle a named assertion enter the bundle — the `use` block, the enclosing member,
   a referenced sibling. This is what keeps Experiment 2's bundle almost empty
   ([ADR-A005](decisions/ADR-A005-slices-not-files.md)).
+- **An empty resolver result is not automatically a flag.** P10 says *fail* toward flagging: a lookup
+  failure becomes a flag, but a question that was answered "none" has no unverified premise to state,
+  so it produces no item. Flagging it would assert an assumption nobody is making.
 - **Stage 5 never re-enters stage 3.** Resolved sources are payload, never new input. That is the
   depth-one guarantee, structural rather than configured (P3).
 

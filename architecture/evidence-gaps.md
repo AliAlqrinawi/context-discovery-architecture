@@ -55,6 +55,7 @@ design:
 | Reverse-caller is a grep, not a call graph (R3, P9) | A scored run showing grep recall is the limiting factor |
 | One-constant token estimate ([ADR-A007](decisions/ADR-A007-token-estimate.md)) | A measured discrepancy that changes a budget decision |
 | Unified-diff format only | A real input the parser cannot read |
+| Zero callers under `--caller-scope` treated as a settled answer, not a scope-limited premise | An experiment showing a finding whose call sites lie outside the searched scope. Exp 4 treats a search across `app/` as the answer, so no premise is earned today |
 
 Each of these is an under-build with a named trigger — not a backlog item.
 
@@ -75,6 +76,7 @@ them for evidence.
 | AA7 | The exit-code taxonomy `0 / 1 / 2` | [03-interfaces](03-interfaces.md) | Ordinary CLI practice; no research basis, none needed |
 | AA8 | JSON as the default format, and `bundle_version` as a versioned contract | [03-interfaces](03-interfaces.md) | The implementation spec says the serialisation is *not* fixed by it |
 | AA9 | The token list that counts as a "persistence-write call" in the `surrounding-transaction` trigger | [ADR-A009](decisions/ADR-A009-premise-catalogue.md) | Exp 1 earned the premise from one reconciliation path; the general list of call shapes is not enumerated by any experiment. Experiment 4 is the precision guard — if the trigger fires there, the list is wrong |
+| AA11 | Recording a successful negative result (zero call sites, no `use` block) as one stderr diagnostic | [03-interfaces](03-interfaces.md), freeze review 05 | The research requires no such output. It exists so the acceptance harness can distinguish "searched, found none" from "never searched" — the assertion Experiment 1 already needs. No bundle effect |
 | AA10 | Widening the `data-state-after-behaviour-change` trigger from `SoftDeletes` to any trait removal inside a class body | [ADR-A009](decisions/ADR-A009-premise-catalogue.md) | Exp 3 earned it for `SoftDeletes` specifically (n=1). Narrowing back to that single trait is the correction if a fixture shows a false positive |
 
 None of these may be treated as validated. Each is stated here rather than argued inside the module

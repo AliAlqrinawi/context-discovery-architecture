@@ -48,7 +48,7 @@ added to it, that is the signal to stop.
 | P7 budget + visible drops | `--budget` required; `BudgetEnforcer` writes every drop into `dropped[]`; the field is never omitted; the drop order is stated in [01-architecture §3.4](01-architecture.md) |
 | P8 deterministic | Fixed stage order, fixed item ordering, lexicographically ordered `filesUnder()` and call sites, no clock, no randomness, no network, no parallelism |
 | P9 free local inputs | Four inputs only; no index, no cache directory, no persistence adapter |
-| P10 fail to flagging | Every resolver returning nothing routes to `AssumptionWriter`; unreadable path ⇒ flag + diagnostic |
+| P10 fail to flagging | Every resolver **failure** routes to `AssumptionWriter`; unreadable path ⇒ flag + diagnostic. A successful negative (search ran, zero results) is not a failure: no item, one diagnostic — flagging it would state an assumption nobody is making (freeze review 05) |
 
 ## 5 · Exclusion → enforcement
 

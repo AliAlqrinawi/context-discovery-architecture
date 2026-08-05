@@ -34,6 +34,15 @@ already loads. No new input, no new module, no extra pass.
 | `unresolved-reference` | A `NamedReference` assertion resolved to nothing — no PSR-4 entry, unreadable path, or member not found | P10 |
 | `call-sites-truncated` | A caller search hit `--max-call-sites` | P10, [ADR-A006](ADR-A006-grep-not-graph.md) |
 
+**A premise exists only where an unverified premise exists.** Every trigger above marks something the
+run could not settle: a caller not checked, a store not inspected, a migration not read, a lookup that
+failed, a search cut short. A question the run *did* settle — a caller search that completes with zero
+call sites, a changed file with no `use` block — leaves nothing unverified, so no premise applies and
+none is invented. A seventh premise for that case was proposed during implementation and **rejected**:
+it would state an assumption that is not being made, which the implementation spec counts as a
+precision failure, and it would enter the catalogue with no experiment behind it, which this ADR's gate
+forbids (freeze review 05).
+
 Two parts of the first and fourth triggers are wider than the single finding that earned them and are
 recorded as architectural assumptions, not evidence: the token list that counts as a
 "persistence-write call" (**AA9**) and the widening of trait removal beyond `SoftDeletes` (**AA10**) —
