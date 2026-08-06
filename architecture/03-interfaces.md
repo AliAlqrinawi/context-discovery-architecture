@@ -165,8 +165,12 @@ interface AssertionResolver {                     // OwnFile / NamedReference / 
     /**
      * @return list<SourceSlice> An empty list is one of TWO cases, distinguished by the
      *   resolver, never by the pipeline:
-     *   (a) lookup FAILURE — the source should exist and could not be read (no PSR-4 entry,
-     *       unreadable path, member not found). Becomes a flag (P10).
+     *   (a) lookup FAILURE — the lookup could not be performed or the source that should
+     *       exist could not be read (no PSR-4 entry, unreadable path, member not found;
+     *       unreadable caller scope). Becomes a flag, using the premise belonging to THAT
+     *       resolver — `unresolved-reference` for a named reference, `caller-search-failed`
+     *       for a caller search. Premises are never shared across resolvers (P10,
+     *       freeze review 06).
      *   (b) successful NEGATIVE — the question was answered and the answer is "none"
      *       (a caller search that completes with zero call sites; a changed file with no
      *       `use` block). No premise exists to state, so: no bundle item, one stderr

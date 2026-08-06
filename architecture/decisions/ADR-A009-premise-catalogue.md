@@ -31,7 +31,8 @@ already loads. No new input, no new module, no extra pass.
 | `atomic-lock-store` | The changed region names `Cache::lock(` | Exp 3 — lock correctness depends on the deployed store being atomic |
 | `schema-index-support` | The changed region names `lockForUpdate(` or `sharedLock(` | Exp 3 — `findConnectedByInstitution(..., lockForUpdate: true)` under a filtered predicate |
 | `data-state-after-behaviour-change` | A **removed** diff line is a `use <Trait>;` statement inside a class body | Exp 3 — dropping `SoftDeletes` makes pre-existing trashed rows visible again |
-| `unresolved-reference` | A `NamedReference` assertion resolved to nothing — no PSR-4 entry, unreadable path, or member not found | P10 |
+| `unresolved-reference` | A `NamedReference` assertion resolved to nothing — no PSR-4 entry, unreadable path, or member not found. **This premise is specific to `NamedReferenceResolver`**; its statement names a named reference, so it may not be reused for another resolver's failure (freeze review 06) | P10 |
+| `caller-search-failed` | A caller search **could not run**: the scope prefix is unreadable or absent. Distinct from zero results, which is a settled answer and yields nothing (freeze review 05) | P10, [ADR-A006](ADR-A006-grep-not-graph.md) |
 | `call-sites-truncated` | A caller search hit `--max-call-sites` | P10, [ADR-A006](ADR-A006-grep-not-graph.md) |
 
 **A premise exists only where an unverified premise exists.** Every trigger above marks something the
@@ -46,7 +47,8 @@ forbids (freeze review 05).
 Two parts of the first and fourth triggers are wider than the single finding that earned them and are
 recorded as architectural assumptions, not evidence: the token list that counts as a
 "persistence-write call" (**AA9**) and the widening of trait removal beyond `SoftDeletes` (**AA10**) —
-see [evidence-gaps.md §5](../evidence-gaps.md).
+see [evidence-gaps.md §5](../evidence-gaps.md). `caller-search-failed` is P10-derived like its two
+siblings and carries the same standing as **AA5**.
 
 **Precision guards, not aspirations.** Experiment 2 must still produce an almost-empty bundle: its
 trace-logging diff names no `Cache::lock`, no lock read, removes no trait, and adds no persistence
@@ -65,6 +67,7 @@ One fixed statement per premise:
 | `data-state-after-behaviour-change` | "ASSUMPTION: behaviour depends on whether pre-existing rows are affected in production; no backfill migration present" | Exp 3 |
 | `schema-index-support` | "ASSUMPTION: locked/filtered lookup assumes supporting schema indexes; migration not verified" | Exp 3 |
 | `unresolved-reference` | "ASSUMPTION: named reference could not be resolved on disk; contract unverified" | P10 |
+| `caller-search-failed` | "ASSUMPTION: callers of this signature could not be searched; scope unreadable" | P10 / A006 |
 | `call-sites-truncated` | "ASSUMPTION: additional call sites exist beyond the search bound; not all verified" | P10 / A006 |
 
 Each flag carries the reason (which assertion it resolves) and provenance: the origin **path** and
@@ -83,7 +86,14 @@ path.
   confirms a resolver — so the schema/config premises must exist as flags, and only as flags.
 - P6/X4: the engine judges nothing. A fixed statement states an unverified premise; it does not
   assess risk or severity.
-- P10: failures must surface as explicit assumptions, which is why the last two entries exist.
+- P10: failures must surface as explicit assumptions, which is why the last three entries exist.
+- **One P10 premise per lookup that can fail, never a shared one.** Two lookups can fail:
+  `NamedReferenceResolver`'s (PSR-4 locate + member slice) and `CallerResolver`'s (scope scan). Each
+  gets its own premise and its own statement, because a fixed statement must be *true* of the case it
+  covers — "named reference could not be resolved" is false of an unreadable caller scope. Reusing it
+  would put an inaccurate assumption in front of the reviewer, which is the failure mode the fixed-text
+  rule exists to prevent (freeze review 06). `CallerResolver` already owned one P10 premise
+  (`call-sites-truncated`); the failure counterpart was missing.
 
 ## Alternatives rejected
 
@@ -93,6 +103,8 @@ path.
 | **LLM-generated assumption text** | X5, absolutely. |
 | **Infer arbitrary premises heuristically from the diff** | That is judgement (X4) and untraceable to an experiment; the catalogue is what keeps R5 evidence-bound. |
 | **A dedicated config/migration resolver instead of premises** | X3: Exp 3 is n=1. Deferred with a named trigger. |
+| **Reusing `unresolved-reference` for a caller-search failure** | Its fixed statement asserts something false of that case ("named reference"). Fixed statements exist so a flag is exactly true; stretching one to a second failure mode restores the free-text problem in disguise (freeze review 06). |
+| **Broadening `unresolved-reference` to "any lookup failure"** | Would require rewording an evidence-derived statement into something vague enough to cover both, losing which lookup failed — the attribution the scored run needs to measure precision per move. |
 | **Drop the concern when it cannot be fetched** | P10: silent omission is indistinguishable from "nothing needed", which corrupts the precision measurement. |
 
 ## Consequences

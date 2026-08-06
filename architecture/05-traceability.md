@@ -11,7 +11,7 @@ added to it, that is the signal to stop.
 | **R2** | Depth-one named-reference resolution via PSR-4, minimal slice | `Discovery\Extraction\NamedReferenceAssertionExtractor`, `Discovery\Resolution\NamedReferenceResolver`, `Adapters\Autoload\ComposerPsr4ClassLocator`, `Adapters\Php\TokenizerMemberSlicer` | 1, 4 |
 | **R3** | Reverse-caller lookup for changed signatures (grep) | `Discovery\Extraction\ChangedSignatureAssertionExtractor`, `Discovery\Resolution\CallerResolver`, `Adapters\Search\ScopedGrepCallSiteSearch`. Signature changes only (Exp 4); a caller question that is not a signature change — Exp 1's transaction — is flag-type per `fetch-vs-flag.md` and counts as a catch per the spec's success criteria | 1, 4 |
 | **R4** | Bundle with reason + lever per item, token accounting | `Domain\Bundle\*`, `Assembly\BundleAssembler`, `Assembly\TokenEstimate`, `Adapters\Serialization\*` | method; 1, 3 |
-| **R5** | Flag path for expensive/unknowable dependencies | `Discovery\Extraction\UnverifiablePremiseAssertionExtractor`, `Discovery\Lever\LeverPolicy`, `Discovery\Lever\PremiseCatalogue` (six premises, one literal trigger each — [ADR-A009](decisions/ADR-A009-premise-catalogue.md)), `Discovery\Flagging\AssumptionWriter` | 1, 3 |
+| **R5** | Flag path for expensive/unknowable dependencies | `Discovery\Extraction\UnverifiablePremiseAssertionExtractor`, `Discovery\Lever\LeverPolicy`, `Discovery\Lever\PremiseCatalogue` (seven premises, one literal trigger each — [ADR-A009](decisions/ADR-A009-premise-catalogue.md)), `Discovery\Flagging\AssumptionWriter` | 1, 3 |
 
 ## 2 · Discovery move → module → evidence
 
@@ -48,7 +48,7 @@ added to it, that is the signal to stop.
 | P7 budget + visible drops | `--budget` required; `BudgetEnforcer` writes every drop into `dropped[]`; the field is never omitted; the drop order is stated in [01-architecture §3.4](01-architecture.md) |
 | P8 deterministic | Fixed stage order, fixed item ordering, lexicographically ordered `filesUnder()` and call sites, no clock, no randomness, no network, no parallelism |
 | P9 free local inputs | Four inputs only; no index, no cache directory, no persistence adapter |
-| P10 fail to flagging | Every resolver **failure** routes to `AssumptionWriter`; unreadable path ⇒ flag + diagnostic. A successful negative (search ran, zero results) is not a failure: no item, one diagnostic — flagging it would state an assumption nobody is making (freeze review 05) |
+| P10 fail to flagging | Every resolver **failure** routes to `AssumptionWriter`, using that resolver's own premise — `unresolved-reference` (named reference) or `caller-search-failed` (caller search); never a shared one (freeze review 06). A successful negative (search ran, zero results) is not a failure: no item, one diagnostic — flagging it would state an assumption nobody is making (freeze review 05) |
 
 ## 5 · Exclusion → enforcement
 

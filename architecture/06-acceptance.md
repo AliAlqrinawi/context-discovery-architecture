@@ -57,7 +57,7 @@ a real filesystem. The tests worth naming up front, because they encode the evid
 | `OwnFileAssertionExtractorTest` (second case) | A `$this->method(` sibling yields `SameFileReference`, never `NamedReference`; a cross-file class yields `NamedReference`, never `SameFileReference` |
 | `AssumptionWriterTest` | One statement per catalogue premise; an unknown premise is impossible to construct (A009) |
 | `UnverifiablePremiseAssertionExtractorTest` | One case per trigger in [ADR-A009](decisions/ADR-A009-premise-catalogue.md): each trigger present ⇒ exactly one premise; each trigger absent ⇒ none. Experiment 2's trace-logging shape yields zero premises |
-| `CallerResolverTest` | The grep runs for `ChangedSignature` only; a transaction-style caller question produces a flag and performs no search. A search completing with **zero** call sites yields no item and no flag — one stderr diagnostic — while an unreadable scope yields a flag (freeze review 05) |
+| `CallerResolverTest` | The grep runs for `ChangedSignature` only; a transaction-style caller question produces a flag and performs no search. A search completing with **zero** call sites yields no item and no flag — one stderr diagnostic (freeze review 05) — while an unreadable or absent scope yields a `caller-search-failed` flag, never `unresolved-reference` (freeze review 06) |
 
 ## 3 · What is *not* tested, on purpose
 
