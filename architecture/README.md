@@ -26,11 +26,21 @@ budget with a visible drop list. It does not review, judge, score, or call a mod
 | 4 | [04-diagrams.md](04-diagrams.md) | High-level, request flow, Context Discovery pipeline, module dependency |
 | 5 | [05-traceability.md](05-traceability.md) | Every module → requirement → experiment. Nothing untraceable. |
 | 6 | [06-acceptance.md](06-acceptance.md) | The acceptance test: bundles reproduced against the four Phase 0 keys |
-| 7 | [decisions/](decisions/) | ADR-A001…A020 — the architecture decisions, with evidence and rejected alternatives |
+| 7 | [decisions/](decisions/) | ADR-A001…A021 — the architecture decisions, with evidence and rejected alternatives |
 | 8 | [evidence-gaps.md](evidence-gaps.md) | What the research repository does *not* settle, the architecture's response, and the fourteen recorded architectural assumptions |
 | 9 | [REVIEW-freeze-01.md](REVIEW-freeze-01.md) · [02](REVIEW-freeze-02.md) · [03](REVIEW-freeze-03.md) · [04](REVIEW-freeze-04.md) · [05](REVIEW-freeze-05.md) · [06](REVIEW-freeze-06.md) | The freeze reviews: findings, corrections applied, the freeze verdict, the two implementation blockers closed, the ACP-01 patch, the empty-result distinction, and the per-resolver failure premise |
 
 ## Status
+
+**ADR-A021 accepted** — two bundle items are the same item when **every field a reviewer can see** is
+the same: lever, reason, assertion kind, provenance path, member and line span, and payload. When two
+items are the same item, the bundle carries it once. Every field in that unit is forced by a keyed
+row of `experiment-16`, because each cheaper identity destroys one: `(path, member, span)` collapses
+`ControllerA::helper` reached as a same-file sibling *and* as a named reference — three items in two
+different `ItemPriority` bands — and payload text collapses a **flag**, taking one of two lines away
+from the reviewer. Flags need no special case: a flag's provenance **is** its origin, so two origins
+are two identities. On the fixture 15 → 13 items and 328 → 278 tokens; **on M7's real pull request
+nothing changes at all**, because it contains no duplicates.
 
 **ADR-A020 accepted** — when a `Fqcn::member` reference cannot be resolved, the class's **surface** is
 fetched instead of nothing, provided all three hold: the map places the class, the located path is
