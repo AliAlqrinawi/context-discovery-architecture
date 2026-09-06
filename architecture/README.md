@@ -26,11 +26,87 @@ budget with a visible drop list. It does not review, judge, score, or call a mod
 | 4 | [04-diagrams.md](04-diagrams.md) | High-level, request flow, Context Discovery pipeline, module dependency |
 | 5 | [05-traceability.md](05-traceability.md) | Every module → requirement → experiment. Nothing untraceable. |
 | 6 | [06-acceptance.md](06-acceptance.md) | The acceptance test: bundles reproduced against the four Phase 0 keys |
-| 7 | [decisions/](decisions/) | ADR-A001…A009 — the architecture decisions, with evidence and rejected alternatives |
-| 8 | [evidence-gaps.md](evidence-gaps.md) | What the research repository does *not* settle, the architecture's response, and the eight recorded architectural assumptions |
+| 7 | [decisions/](decisions/) | ADR-A001…A020 — the architecture decisions, with evidence and rejected alternatives |
+| 8 | [evidence-gaps.md](evidence-gaps.md) | What the research repository does *not* settle, the architecture's response, and the fourteen recorded architectural assumptions |
 | 9 | [REVIEW-freeze-01.md](REVIEW-freeze-01.md) · [02](REVIEW-freeze-02.md) · [03](REVIEW-freeze-03.md) · [04](REVIEW-freeze-04.md) · [05](REVIEW-freeze-05.md) · [06](REVIEW-freeze-06.md) | The freeze reviews: findings, corrections applied, the freeze verdict, the two implementation blockers closed, the ACP-01 patch, the empty-result distinction, and the per-resolver failure premise |
 
 ## Status
+
+**ADR-A020 accepted** — when a `Fqcn::member` reference cannot be resolved, the class's **surface** is
+fetched instead of nothing, provided all three hold: the map places the class, the located path is
+**project source**, and nothing in that class's own file accounts for the member. This is M13's
+boundary **B4**, applied at resolution time, and it closes gap **G1** — Experiment 1's model-surface
+move had never fired on real Laravel code, which reaches a model through `Setting::updateOrCreate(...)`
+and never through `new Setting`. The unresolved-member flag is **retained** beside the surface, not
+replaced by it: `Package::activatte` — a typo — satisfies the same three conditions as
+`Package::create`, and ADR-A016 established that nothing available separates them, so replacing the
+flag would report a typo as satisfied context (P10, M0 risk R1). On M7's real pull request the bundle
+moves to **18 items / 606 tokens**, recall **1/4 → 3/4**, still **zero** vendor items.
+
+**ADR-A019 accepted** — a fetched slice is withheld when, and only when, the diff shows that exact
+span **in full**: the declaring file was created, or one changed region contains the span entirely.
+"The path appears in the diff" is explicitly **not** sufficient — a modified file shows only its
+hunks, and `experiment-12` keys that counter-case. On M7's real pull request the bundle is now
+**11 items / 218 tokens**, down from 1231 when the tool was first measured end to end.
+
+**ADR-A018 accepted** — a file the diff **created** yields no own-file assertions: every line of it is
+already in front of the reviewer, so fetching its `use` block, enclosing member or siblings hands the
+diff back as context (ADR-A005). Non-PHP files are no longer read as PHP, and the `<?php` open tag is
+no longer reported as a missing import. On M7's real pull request the bundle falls from **26 items /
+1231 tokens to 14 items / 536 tokens** with **zero items added** and every flag intact.
+
+**ADR-A017 accepted** — a diagnostic now names the state that was observed. `pathFor()` returns null
+for two different states, and the tool reported both as `missing PSR-4 entry`; that is **false** when
+the prefix exists and only the file is missing. State B gets `class file not found`; state A keeps its
+message, because it was already true. The bundle is byte-identical — no item, lever, premise,
+provenance, ordering, token count or schema field changed.
+
+**ADR-A016 accepted** — open question **OQ6** is closed as **unresolvable on the current evidence**.
+`Package::create`, `Package::activatte` and `Package::totallyUnknownThing` are identical in every one
+of the seven facts available when resolution gives up, yet their correct answers differ — so no rule
+over those facts can classify them. M0's proposed Eloquent rule **L1** is now known to be unsafe
+rather than merely unbuilt. **Nothing changed.**
+
+**ADR-A015 accepted** — ADR-A010's revisit trigger was **evaluated and declined**. M7's E5.4 satisfies
+its wording, but the one-hop relaxation it licenses reaches neither E5.4 (three files away, and
+blocked by *extraction* rather than depth) nor any of the nine measured false positives (all Eloquent
+dynamic dispatch at three or more hops). Across an entire real application, one hop into project code
+fixes **0** of 190 static call sites. The boundary stands; **nothing changed**.
+
+**ADR-A014 accepted** — Composer's generated `vendor/composer/autoload_psr4.php` is read as
+**location** metadata: **parsed, never executed**, appended after the project's own map so the project
+keeps precedence, with ownership still decided by the path. A realistic Laravel application — whose
+`composer.json` declares only `App\` — now reaches the settlement behaviour A011–A013 built, without
+any framework source entering a bundle. A bare checkout, or absent/malformed metadata, degrades to
+exactly the previous behaviour.
+
+**ADR-A013 accepted** — a member declared by an installed dependency is **settled, not fetched**: no
+bundle item, one diagnostic citing its file and line. The evidence is `context-types.md` type 2,
+*"Named collaborator code (application code, depth one)"*, which covers methods explicitly. A member
+that is **not** really there still flags, so a typo against a real package is never swallowed. With
+this the ownership rule is uniform across classes and members, and no framework source reaches any
+bundle.
+
+**ADR-A012 accepted** — the bare-class **surface** move applies to the project's own classes. A class
+the PSR-4 map places inside Composer's dependency directory is settled from its path alone: no bundle
+item, one cited diagnostic, and its file is never opened. This closes the largest precision defect the
+M1 fixture recorded — one framework return type had expanded into 115 slices and 13,426 tokens — with
+no new assertion kind, premise, lever, bundle field or port.
+
+**ADR-A011 accepted** — the two recognition rules ADR-A010 left reachable are implemented: a facade's
+`@method static` tag, and Eloquent's `scope<Name>` convention. A framework-known reference is a
+**successful negative** (freeze review 05): no bundle item, one cited diagnostic, and the framework's
+own source is never fetched. A scope resolves to the *project's* own member and is fetched normally.
+No assertion kind, premise, lever, bundle field or port was added — `Ports` stays at five.
+
+**ADR-A010 accepted** — resolution opens at most **one file beyond the changed file**; inheritance
+(`extends`, `use <Trait>`) and annotation (`@mixin`) chains are **not** followed, even to verify that
+a member exists. This resolves open question OQ1 from the M0 framework-knowledge research and closes
+no other question. It separates the two guarantees that "depth one" had been carrying as one phrase:
+**D1**, resolved sources never become new input (P4/X1 — *never*), and **D2**, at most one file
+beyond the changed file (X2 — *not yet*, now an under-build with a named trigger in
+[evidence-gaps.md](evidence-gaps.md) §4). No module, port, capability, or contract changed; the
+implementation at `v0.1.0` already conforms.
 
 **Implementation ready** at [REVIEW-freeze-06.md](REVIEW-freeze-06.md) — patch: a seventh premise,
 `caller-search-failed`, so each lookup that can fail has its own true statement; premises are never
