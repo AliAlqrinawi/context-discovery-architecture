@@ -26,11 +26,21 @@ budget with a visible drop list. It does not review, judge, score, or call a mod
 | 4 | [04-diagrams.md](04-diagrams.md) | High-level, request flow, Context Discovery pipeline, module dependency |
 | 5 | [05-traceability.md](05-traceability.md) | Every module → requirement → experiment. Nothing untraceable. |
 | 6 | [06-acceptance.md](06-acceptance.md) | The acceptance test: bundles reproduced against the four Phase 0 keys |
-| 7 | [decisions/](decisions/) | ADR-A001…A021 — the architecture decisions, with evidence and rejected alternatives |
+| 7 | [decisions/](decisions/) | ADR-A001…A022 — the architecture decisions, with evidence and rejected alternatives |
 | 8 | [evidence-gaps.md](evidence-gaps.md) | What the research repository does *not* settle, the architecture's response, and the fourteen recorded architectural assumptions |
 | 9 | [REVIEW-freeze-01.md](REVIEW-freeze-01.md) · [02](REVIEW-freeze-02.md) · [03](REVIEW-freeze-03.md) · [04](REVIEW-freeze-04.md) · [05](REVIEW-freeze-05.md) · [06](REVIEW-freeze-06.md) | The freeze reviews: findings, corrections applied, the freeze verdict, the two implementation blockers closed, the ACP-01 patch, the empty-result distinction, and the per-resolver failure premise |
 
 ## Status
+
+**ADR-A022 accepted** — an experiment resolves source against the tree of **the commit it is
+reviewing**, obtained as a detached `git worktree`, never against the repository's current HEAD. This
+corrects a **measurement** defect, not a production one: M18 and M19 passed `--repo` pointing at HEAD
+while `--diff` was a historical commit, so for a commit whose files had since moved the tool read the
+wrong tree or none at all — 6 of M18's 46 commits carry an `unreadable path` diagnostic for it, and
+it compromised one M19 task outright. On that task the correction moves the bundle from 2 items / 221
+tokens to 4 / 449; across M20's corpus the corrected harness produces materially larger bundles, so
+**M18's and M19's figures are understated rather than inflated**. Pinned by
+`tests/Acceptance/HarnessResolvesAtCommitTreeTest.php`. No production file changed.
 
 **ADR-A021 accepted** — two bundle items are the same item when **every field a reviewer can see** is
 the same: lever, reason, assertion kind, provenance path, member and line span, and payload. When two
