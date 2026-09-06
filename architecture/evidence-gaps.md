@@ -65,6 +65,9 @@ design:
 | A **fetched** item does not record which changed region requested it — true of every fetched item, not only the ones that were duplicated, and only visible once the duplicates are gone (M16) | A key-first experiment asking whether a reviewer acts differently for knowing which line asked. It is a **schema change**, so the bar is a row that cannot be answered without it |
 Each of these is an under-build with a named trigger — not a backlog item.
 
+| **Coverage** — on five real commits from one real application the tool emitted a bundle for **one**. Four were correctly empty: a created migration (ADR-A018) plus a framework-known `Schema::table` (ADR-A011) plus a dependency `Blueprint` (ADR-A012) sum to nothing, and two commits produced no assertion at all because their changed lines name no class — only `$var->method()`, `config()` and `route()` calls, none of which is in the closed three-form list. Measured by M17 | Measure the distribution first: run every commit of the real repository and report bundle size and, for the empty ones, which decision produced the silence. Widening a form before that is known would be guessing at which of four correct decisions is the one that matters |
+| A flag that names a risk did not make a reviewer act on it — M17's T1 bundle said *"ASSUMPTION: this code assumes a surrounding transaction; caller not checked"*, which is almost exactly the keyed defect, and the reviewer went to `composer.lock` instead | A key-first experiment on flag wording and placement. One observation, and the sample that produced it is n=1 |
+
 ## 5 · Architectural assumptions
 
 Recorded by [REVIEW-freeze-01.md](REVIEW-freeze-01.md). Each is defensible and none expands scope,
