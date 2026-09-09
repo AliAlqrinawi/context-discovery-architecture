@@ -52,12 +52,14 @@ a real filesystem. The tests worth naming up front, because they encode the evid
 | `NamedReferenceResolverTest` | Depth one only: the resolved file's own references produce **no** further assertions |
 | `NamedReferenceAssertionExtractorTest` | Only the three recognised **cross-file** reference forms ([01-architecture §3.3](01-architecture.md)) yield assertions; any other form yields none. A `$this->method(` sibling is a `SameFileReference` and must **not** appear here (freeze review 04) |
 | `ChangedSignatureAssertionExtractorTest` | Arity/parameter-shape change detected from old vs new signature; unchanged signatures produce nothing |
+| `ChangedReturnContractAssertionExtractorTest` | All four conditions of [ADR-A023](decisions/ADR-A023-changed-return-contract.md) must hold together; each negative control removes exactly one. An added return the region's span does not contain yields nothing |
+| `ChangedReturnContractHunkOffsetTest` | Driven by real `git diff` output: the member named is the one containing the changed return, whether the hunk opens between two members or inside the previous one |
 | `BundleItemTest` | Constructing an item without a reason or a lever is rejected (P5) |
 | `BudgetEnforcerTest` | Over-budget drops follow the `ItemPriority` order stated in [01-architecture §3.4](01-architecture.md), banding from `assertion_kind` + `lever` alone; every drop is recorded (P7) |
 | `OwnFileAssertionExtractorTest` (second case) | A `$this->method(` sibling yields `SameFileReference`, never `NamedReference`; a cross-file class yields `NamedReference`, never `SameFileReference` |
 | `AssumptionWriterTest` | One statement per catalogue premise; an unknown premise is impossible to construct (A009) |
 | `UnverifiablePremiseAssertionExtractorTest` | One case per trigger in [ADR-A009](decisions/ADR-A009-premise-catalogue.md): each trigger present ⇒ exactly one premise; each trigger absent ⇒ none. Experiment 2's trace-logging shape yields zero premises |
-| `CallerResolverTest` | The grep runs for `ChangedSignature` only; a transaction-style caller question produces a flag and performs no search. A search completing with **zero** call sites yields no item and no flag — one stderr diagnostic (freeze review 05) — while an unreadable or absent scope yields a `caller-search-failed` flag, never `unresolved-reference` (freeze review 06) |
+| `CallerResolverTest` | The grep runs for `ChangedSignature` and `ChangedReturnContract` only; a transaction-style caller question produces a flag and performs no search. A search completing with **zero** call sites yields no item and no flag — one stderr diagnostic (freeze review 05) — while an unreadable or absent scope yields a `caller-search-failed` flag, never `unresolved-reference` (freeze review 06) |
 
 ## 3 · What is *not* tested, on purpose
 
@@ -71,5 +73,5 @@ a real filesystem. The tests worth naming up front, because they encode the evid
 
 Per the implementation spec, the first input after the acceptance test passes is the **sloppy
 Experiment 5 commit**, which the research repository never ran. If it produces an assertion kind
-the four extractors cannot express, the move-set was not bounded and the scope in ADR-003 is
+the five extractors cannot express, the move-set was not bounded and the scope in ADR-003 is
 incomplete — which is a finding to record in the research repository, not a patch to make here.

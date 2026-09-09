@@ -26,11 +26,27 @@ budget with a visible drop list. It does not review, judge, score, or call a mod
 | 4 | [04-diagrams.md](04-diagrams.md) | High-level, request flow, Context Discovery pipeline, module dependency |
 | 5 | [05-traceability.md](05-traceability.md) | Every module → requirement → experiment. Nothing untraceable. |
 | 6 | [06-acceptance.md](06-acceptance.md) | The acceptance test: bundles reproduced against the four Phase 0 keys |
-| 7 | [decisions/](decisions/) | ADR-A001…A022 — the architecture decisions, with evidence and rejected alternatives |
+| 7 | [decisions/](decisions/) | ADR-A001…A023 — the architecture decisions, with evidence and rejected alternatives |
 | 8 | [evidence-gaps.md](evidence-gaps.md) | What the research repository does *not* settle, the architecture's response, and the fourteen recorded architectural assumptions |
 | 9 | [REVIEW-freeze-01.md](REVIEW-freeze-01.md) · [02](REVIEW-freeze-02.md) · [03](REVIEW-freeze-03.md) · [04](REVIEW-freeze-04.md) · [05](REVIEW-freeze-05.md) · [06](REVIEW-freeze-06.md) | The freeze reviews: findings, corrections applied, the freeze verdict, the two implementation blockers closed, the ACP-01 patch, the empty-result distinction, and the per-resolver failure premise |
 
 ## Status
+
+**ADR-A023 accepted** — a body that keeps its signature but changes what *kind* of value it
+returns is a caller question. `return $query->get();` becoming `return $query->first();` inside
+`getAll(): Collection` moves no parameter, narrows no declared type, and breaks every caller that
+iterates the result — none of which the diff shows. A sixth `assertion_kind`,
+`changed_return_contract`, raised by a fifth extractor when a removed and an added `return` end in
+names a **closed cardinality table** puts in different classes. It resolves through the existing
+`CallerResolver` — the same bounded, non-recursive grep, so the **resolver count stays three** —
+and is banded and dropped exactly as `ChangedSignature` is. `bundle_version` stays `1`: adding a
+kind is additive. Four receiver-dependent names (`find`, `findOrFail`, `chunk`, `toArray`) were
+removed from the table rather than guessed, and the one that remains against the strict standard
+(`get`) is recorded in the ADR rather than hidden. The move also made explicit a contract
+the tool had always relied on implicitly: **`--repo` is the post-image tree**, now stated in
+`03-interfaces.md` §1. Pinned by `ChangedReturnContractHunkOffsetTest`, which drives real
+`git diff` output. The ADR records that ADR-A003's four-step gate was satisfied **out of order** —
+the `Wiring` change preceded this ADR.
 
 **ADR-A022 accepted** — an experiment resolves source against the tree of **the commit it is
 reviewing**, obtained as a detached `git worktree`, never against the repository's current HEAD. This

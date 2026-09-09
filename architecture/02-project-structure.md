@@ -31,10 +31,11 @@ context-discovery/
 │   │   ├── Parsing/
 │   │   │   └── UnifiedDiffParser.php      # pure, not a port
 │   │   ├── Extraction/
-│   │   │   ├── AssertionExtractor.php            # facade over the four below, fixed order
+│   │   │   ├── AssertionExtractor.php            # facade over the five below, fixed order
 │   │   │   ├── OwnFileAssertionExtractor.php     # R1
 │   │   │   ├── NamedReferenceAssertionExtractor.php  # R2
 │   │   │   ├── ChangedSignatureAssertionExtractor.php # R3
+│   │   │   ├── ChangedReturnContractAssertionExtractor.php # R3 · ADR-A023
 │   │   │   └── UnverifiablePremiseAssertionExtractor.php # R5
 │   │   ├── Lever/
 │   │   │   ├── LeverPolicy.php                   # the fetch-vs-flag decision rule

@@ -65,7 +65,7 @@ inward only ([02-project-structure.md](02-project-structure.md) §4).
 | Module | Responsibility | Traces to |
 |---|---|---|
 | `Domain\Diff` | Immutable value types: `Diff`, `ChangedFile`, `ChangedRegion`, `ChangedMember` (name + old/new signature). Knows nothing about diff *text*. | R1 |
-| `Domain\Assertion` | `Assertion` (kind, subject, origin region, human-readable claim) and `AssertionKind`: `SameFileSymbolAbsence`, `SameFileReference`, `NamedReference`, `ChangedSignature`, `UnverifiablePremise` — one kind per move, so a kind always names its resolver and its priority band. The core domain concept — the diff's *claims*, not its files. Plus `ResolvedAssertion` — assertion + lever + either slices or a statement — the single value handed from resolution to assembly. | P1, ADR-002 |
+| `Domain\Assertion` | `Assertion` (kind, subject, origin region, human-readable claim) and `AssertionKind`: `SameFileSymbolAbsence`, `SameFileReference`, `NamedReference`, `ChangedSignature`, `ChangedReturnContract`, `UnverifiablePremise` — one kind per move, so a kind always names its resolver and its priority band. The core domain concept — the diff's *claims*, not its files. Plus `ResolvedAssertion` — assertion + lever + either slices or a statement — the single value handed from resolution to assembly. | P1, ADR-002 |
 | `Domain\Bundle` | `Bundle` (ordered items, budget, used tokens, drops), `BundleItem` (payload, reason, lever, provenance), `Lever` enum (`Fetched`\|`Flagged`), `Provenance` (path, member, line span), `DroppedItem` (reason, note). Enforces the invariant: **no item without a reason and a lever**. | R4, P5 |
 | `Domain\Source` | `SourceSlice` (path, member, line span, text) — the minimal fetched payload. | R2 |
 
@@ -79,7 +79,7 @@ estimation perform no I/O and have one implementation each, so they are plain cl
 |---|---|---|
 | `Ports\SourceRepository` | Read-only, root-scoped file access: `text(path)`, `exists(path)`, `filesUnder(prefix, extension)`. | R1, P9 |
 | `Ports\ClassLocator` | Fully-qualified class name → file path, via the PSR-4 map. Depth-one only, no index. | R2, P9 |
-| `Ports\MemberSlicer` | File text + member name → `SourceSlice`; also `useBlock(text)` and `memberNames(text)`. | R1, R2 |
+| `Ports\MemberSlicer` | File text + member name → `SourceSlice`; also `useBlock(text)`, `memberNames(text)`, and the two line questions kept apart: `enclosingMemberName(line)` — which member is this line *in* — and `memberOwningLine(line)` — whose statement it *is*, null inside a closure declared in that member ([ADR-A023](decisions/ADR-A023-changed-return-contract.md)). | R1, R2 |
 | `Ports\CallSiteSearch` | Method name + scope prefix → `CallSite[]` (path, line, line text). A bounded grep, never a graph. | R3 |
 | `Ports\BundleWriter` | `Bundle` → serialised output. | R4 |
 
@@ -88,15 +88,16 @@ estimation perform no I/O and have one implementation each, so they are plain cl
 | Module | Responsibility | Traces to |
 |---|---|---|
 | `Discovery\Parsing\UnifiedDiffParser` | Unified diff text → `Domain\Diff`. A pure class, not a port: no I/O, one implementation. Old signatures come from the hunk's removed lines; a rename is treated as two members and is not tracked. | R1 |
-| `Discovery\Extraction\AssertionExtractor` | Facade. Runs the four extractors over every changed region in a fixed order and returns a deterministic, de-duplicated `Assertion[]`. | spec resp. 3 |
+| `Discovery\Extraction\AssertionExtractor` | Facade. Runs the five extractors over every changed region in a fixed order and returns a deterministic, de-duplicated `Assertion[]`. | spec resp. 3 |
 | `…\OwnFileAssertionExtractor` | Reads the changed file's own text: emits `SameFileSymbolAbsence` for a symbol used in the region but missing from the `use` block, and `SameFileReference` for sibling members the region calls (`$this->method(`). | R1; Exp 1 (missing `Log`, `upsertFromPlaid`) |
 | `…\NamedReferenceAssertionExtractor` | Emits `NamedReference` for classes/members the region names and that are **not** defined in the changed file — model, client method, enum. Same-file siblings belong to `OwnFileAssertionExtractor`. Depth one; **does not** follow the resolved file's own references (P3). | R2; Exp 1, 4 |
 | `…\ChangedSignatureAssertionExtractor` | Compares old/new signatures of members touched by the diff; emits `ChangedSignature` when arity or parameter shape changed. | R3; Exp 4 (`reactivate`) |
+| `…\ChangedReturnContractAssertionExtractor` | Compares the terminal call of a removed and an added `return` against `FrameworkKnowledge`'s closed cardinality table; emits `ChangedReturnContract` when the classes differ and the added return is the member's **own**. Reads the added line's own post-image number, never the hunk's start, and rejects a return that belongs to a closure inside the member rather than to the member. | R3; [ADR-A023](decisions/ADR-A023-changed-return-contract.md) |
 | `…\UnverifiablePremiseAssertionExtractor` | Emits `UnverifiablePremise` from a **closed, evidence-derived catalogue** of premises a file cannot settle: surrounding-transaction, atomic-lock-store, schema-index-support, data-state-after-behaviour-change (plus three P10 failure premises, one per lookup that can fail). Each has a single literal **trigger** — a premise is emitted if and only if its trigger is present ([ADR-A009](decisions/ADR-A009-premise-catalogue.md)); there is no inference path. Adding a premise, or a trigger, requires a new experiment. | R5; Exp 1, 3 |
 | `Discovery\Lever\LeverPolicy` | One pure function implementing `fetch-vs-flag.md`'s decision rule: named + single + depth-one on disk → `Fetched`; expensive (reverse-graph) or unknowable (runtime/data) → `Flagged`. No heuristics beyond that rule. | R5, P2 |
 | `Discovery\Resolution\OwnFileResolver` | Fetches the region's own `use` block, the enclosing member, and named sibling members. | R1 |
 | `Discovery\Resolution\NamedReferenceResolver` | Locates the class (`ClassLocator`), slices the single named member or the model/enum surface (`MemberSlicer`). Unresolved → returns nothing and hands the assertion back for flagging (P10). | R2 |
-| `Discovery\Resolution\CallerResolver` | For a `ChangedSignature`, greps call sites within the configured scope and returns the matching lines. Bounded: scope prefix, max call sites, no recursion. A search that completes with **zero** call sites is a successful negative — no item, no flag, one stderr diagnostic (freeze review 05). A search that **cannot run** (unreadable or absent scope) is a failure ⇒ the `caller-search-failed` premise (freeze review 06). | R3 |
+| `Discovery\Resolution\CallerResolver` | For a `ChangedSignature` or a `ChangedReturnContract`, greps call sites within the configured scope and returns the matching lines. Bounded: scope prefix, max call sites, no recursion. A search that completes with **zero** call sites is a successful negative — no item, no flag, one stderr diagnostic (freeze review 05). A search that **cannot run** (unreadable or absent scope) is a failure ⇒ the `caller-search-failed` premise (freeze review 06). | R3 |
 | `Discovery\Flagging\AssumptionWriter` | Renders one flagged assertion into a one-line `ASSUMPTION: …` payload plus its reason. Text templates only, one per catalogue premise. | R5 |
 
 #### Reference forms recognised by `NamedReferenceAssertionExtractor`
@@ -124,10 +125,13 @@ existing load, no new input), and nothing outside the list can produce a premise
 Experiment 2's bundle almost empty — no trigger fires on it — and what makes Experiment 4 the
 precision guard for the transaction trigger.
 
-#### The caller is fetched only for a changed signature
+#### The caller is fetched only for a changed contract
 
-`CallerResolver` runs for `ChangedSignature` assertions and nothing else. A caller question that is
-*not* a signature change — Experiment 1's "is this wrapped in a transaction?" — is **flagged**, never
+`CallerResolver` runs for `ChangedSignature` and `ChangedReturnContract` assertions and nothing
+else. Both ask the one question a bounded grep answers — *who calls this member?* — one because the
+parameter list moved, the other because the returned cardinality did
+([ADR-A023](decisions/ADR-A023-changed-return-contract.md)). A caller question that is *not*
+either — Experiment 1's "is this wrapped in a transaction?" — is **flagged**, never
 searched: `fetch-vs-flag.md` names it the canonical flag case, and the implementation spec's success
 criteria count "flags as a catch for the flag-type findings (e.g. the transaction assumption)". The
 acceptance expectations mark items accordingly ([06-acceptance.md](06-acceptance.md) §1).
@@ -151,7 +155,7 @@ resolver produced an item (freeze review 04).
 |---|---|---|
 | 1 · never dropped | Flagged items, any kind | Cost is near-zero, and a silent omission is indistinguishable from "nothing needed" (P10, `fetch-vs-flag.md`) |
 | 2 | `SameFileSymbolAbsence` + `SameFileReference` slices — `use` block, enclosing member, named siblings | Free on disk, the substrate every other move builds on (R1, Exp 1) |
-| 3 | `ChangedSignature` call sites | The recurring high-severity move and the sharpest A-vs-C differential (R3, Exp 1, 4) |
+| 3 | `ChangedSignature` + `ChangedReturnContract` call sites | The recurring high-severity move and the sharpest A-vs-C differential (R3, Exp 1, 4). Both kinds band together: one member, one caller question |
 | 4 · dropped first | `NamedReference` slices — cross-file only | Valuable and cheap, but the move Exp 2 shows must never be pulled speculatively |
 
 Within a priority band, the largest estimated item is dropped first, so the fewest items are lost.

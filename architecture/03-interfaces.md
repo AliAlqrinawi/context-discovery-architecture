@@ -20,7 +20,7 @@ context-discover --diff <path|-> --repo <path> --budget <int>
 | Option | Required | Default | Meaning |
 |---|---|---|---|
 | `--diff` | yes | — | Unified diff for the commit under review; `-` reads stdin |
-| `--repo` | yes | — | Repository root. All reads are scoped inside it |
+| `--repo` | yes | — | Repository root, holding the tree **as `--diff` leaves it** — the post-image. All reads are scoped inside it |
 | `--budget` | **yes** | none | Token budget. No default: the research fixes no number ([ADR-A008](decisions/ADR-A008-required-budget.md)) |
 | `--format` | no | `json` | `json` (stable machine contract) or `markdown` (paste alongside the diff) |
 | `--caller-scope` | no | `app/` | Path prefix for the reverse-caller grep (Exp 4's minimum context) |
@@ -29,6 +29,12 @@ context-discover --diff <path|-> --repo <path> --budget <int>
 **Contract**
 
 - Deterministic: same diff + same repository state ⇒ byte-identical output (P8).
+- **`--repo` is the post-image**: the tree with `--diff` already applied, so a line the diff adds
+  is a line the tree contains. Extraction reads post-image line numbers against these files
+  ([ADR-A023](decisions/ADR-A023-changed-return-contract.md) is the first move to depend on it;
+  the harness of [ADR-A022](decisions/ADR-A022-experiments-resolve-at-the-reviewed-commit.md)
+  satisfies it by checking the reviewed commit out into a detached worktree). Pointed at a
+  pre-image tree the tool does not misreport: the added line is not found and nothing is claimed.
 - Read-only: the tool never writes inside `--repo`.
 - No network, no subprocess, no LLM, no state directory (P9, X5).
 - Diagnostics go to stderr only; the bundle on stdout is always parseable and carries no diagnostics.
@@ -83,7 +89,7 @@ context-discover --diff <path|-> --repo <path> --budget <int>
 | `used_tokens` | Sum of `items[].tokens`; always ≤ `budget_tokens` |
 | `items[].lever` | `fetched` \| `flagged`. Required (P5) |
 | `items[].reason` | Non-empty string naming the reference or assumption resolved. Required — an item without one is a defect, not a warning (P5) |
-| `items[].assertion_kind` | `same_file_symbol_absence` \| `same_file_reference` \| `named_reference` \| `changed_signature` \| `unverifiable_premise`. One value per discovery move, so precision can be measured **per move** after the scored run — and so `ItemPriority` can band an item from this field alone |
+| `items[].assertion_kind` | `same_file_symbol_absence` \| `same_file_reference` \| `named_reference` \| `changed_signature` \| `changed_return_contract` \| `unverifiable_premise`. One value per discovery move, so precision can be measured **per move** after the scored run — and so `ItemPriority` can band an item from this field alone |
 | `items[].provenance` | `path`, optional `member`, optional `lines` — enough for a human to verify the slice by hand. A fetched item carries `member` whenever the slice is one; a flagged item carries it only when the failing assertion named one ([ADR-A009](decisions/ADR-A009-premise-catalogue.md)) |
 | `items[].payload` | Fetched: the minimal source slice. Flagged: the assumption sentence, nothing else |
 | `dropped[]` | Every budget drop, with its reason. Empty array when nothing was dropped. Never omitted (P7) |
@@ -97,8 +103,8 @@ that completes with zero call sites, or a changed file with no `use` block. It i
 found none" from "never searched"; it produces no bundle item and no flag (freeze review 05).
 
 **Ordering** (fixed, so output is diffable): items sorted by `assertion_kind` in the order
-`same_file_symbol_absence`, `same_file_reference`, `changed_signature`, `named_reference`,
-`unverifiable_premise`, then by
+`same_file_symbol_absence`, `same_file_reference`, `changed_signature`, `changed_return_contract`,
+`named_reference`, `unverifiable_premise`, then by
 `provenance.path`, then by `provenance.member`. Drops keep the order in which they were dropped.
 
 **Markdown format** — same information, human-readable, one `##` heading per item carrying lever,
@@ -124,7 +130,8 @@ interface MemberSlicer {                           // PHP text → minimal slice
     public function member(string $fileText, string $memberName): ?SourceSlice;
     /** @return list<string> */
     public function memberNames(string $fileText): array;
-    public function enclosingMemberName(string $fileText, int $line): ?string;
+    public function enclosingMemberName(string $fileText, int $line): ?string;   // which member am I in?
+    public function memberOwningLine(string $fileText, int $line): ?string;      // whose statement is this?
 }
 
 interface CallSiteSearch {                         // a bounded grep, never a graph
@@ -145,7 +152,7 @@ final class AssertionExtractor {
     public function extract(Diff $diff, SourceRepository $source): array;
 }
 
-interface RegionAssertionExtractor {               // implemented by the four extractors only
+interface RegionAssertionExtractor {               // implemented by the five extractors only
     /** @return list<Assertion> */
     public function forRegion(ChangedFile $file, ChangedRegion $region, string $fileText): array;
 }
@@ -157,7 +164,7 @@ final class LeverPolicy {
 // Resolver dispatch is an explicit match on AssertionKind in Pipeline\DiscoverContext:
 //   SameFileSymbolAbsence, SameFileReference → OwnFileResolver
 //   NamedReference                          → NamedReferenceResolver
-//   ChangedSignature                        → CallerResolver
+//   ChangedSignature, ChangedReturnContract  → CallerResolver
 //   UnverifiablePremise                     → AssumptionWriter (flag; never resolved)
 // Every kind has exactly one destination; no probing, no fall-through.
 
@@ -202,11 +209,11 @@ final class BudgetEnforcer {
 }
 ```
 
-`RegionAssertionExtractor` and `AssertionResolver` exist **only** to keep the four extractors and
+`RegionAssertionExtractor` and `AssertionResolver` exist **only** to keep the five extractors and
 three resolvers uniform inside the pipeline. They are not extension points: implementations are a
 closed set, constructed explicitly in `Cli\Wiring`, with no discovery, registration, or
 configuration ([ADR-A003](decisions/ADR-A003-closed-move-set.md)). Dispatch is an explicit `match` on
-`AssertionKind` inside `Pipeline\DiscoverContext` — there is no `supports()` probe — so all four kinds
+`AssertionKind` inside `Pipeline\DiscoverContext` — there is no `supports()` probe — so all six kinds
 and their resolvers are visible in one place.
 
 ## 5 · What deliberately has no interface

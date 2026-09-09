@@ -120,6 +120,7 @@ flowchart TD
   E2["NamedReference<br/>class / model / enum / method named in the region<br/>R2 · Exp 1,4"]
   E3["ChangedSignature<br/>arity or parameter shape changed<br/>R3 · Exp 1,4"]
   E4["UnverifiablePremise<br/>closed catalogue: transaction · atomic-lock-store ·<br/>schema-index-support · data-state<br/>R5 · Exp 1,3"]
+  E5["ChangedReturnContract<br/>returned cardinality changed, signature untouched<br/>R3 · ADR-A023"]
 
   S4{"4 · LeverPolicy<br/>named + single + depth-one on disk?"}
   F1["5a · FETCH minimal slice"]
@@ -138,8 +139,8 @@ flowchart TD
   X3["✗ config / migration resolver (n=1 → flag)"]
 
   S1 --> S2 --> S3
-  S3 --> E1 & E2 & E3 & E4
-  E1 & E2 & E3 & E4 --> S4
+  S3 --> E1 & E2 & E3 & E4 & E5
+  E1 & E2 & E3 & E4 & E5 --> S4
   S4 -->|cheap, named, depth-one| F1
   S4 -->|reverse-graph-deep · runtime · data-state| F2
   F1 --> R1 & R2 & R3
