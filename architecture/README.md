@@ -26,11 +26,29 @@ budget with a visible drop list. It does not review, judge, score, or call a mod
 | 4 | [04-diagrams.md](04-diagrams.md) | High-level, request flow, Context Discovery pipeline, module dependency |
 | 5 | [05-traceability.md](05-traceability.md) | Every module → requirement → experiment. Nothing untraceable. |
 | 6 | [06-acceptance.md](06-acceptance.md) | The acceptance test: bundles reproduced against the four Phase 0 keys |
-| 7 | [decisions/](decisions/) | ADR-A001…A023 — the architecture decisions, with evidence and rejected alternatives |
+| 7 | [decisions/](decisions/) | ADR-A001…A024 — the architecture decisions, with evidence and rejected alternatives |
 | 8 | [evidence-gaps.md](evidence-gaps.md) | What the research repository does *not* settle, the architecture's response, and the fourteen recorded architectural assumptions |
 | 9 | [REVIEW-freeze-01.md](REVIEW-freeze-01.md) · [02](REVIEW-freeze-02.md) · [03](REVIEW-freeze-03.md) · [04](REVIEW-freeze-04.md) · [05](REVIEW-freeze-05.md) · [06](REVIEW-freeze-06.md) | The freeze reviews: findings, corrections applied, the freeze verdict, the two implementation blockers closed, the ACP-01 patch, the empty-result distinction, and the per-resolver failure premise |
 
 ## Status
+
+**ADR-A024 accepted** — the bundle contract is frozen at **`bundle_version` 2**. It states each
+claim once in `assertions[]` and has the evidence point back by `assertion_id`: the M26
+reproduction repeated one 165-character sentence into twenty-one items, and the claim's subject —
+`getAll` — existed nowhere as data, recoverable only by parsing prose. `subject` is now a field,
+taken from the extractor's own datum. `run` reports what produced the bundle: a declared
+`engine_version`, a **hash-guarded** `policy_version`, and a `framework_table_version` derived from
+the table's content. `repo_sha` comes from the new `--repo-sha` because the tool spawns no process
+(P9) and ADR-A022's detached worktree has no readable `.git` directory. Diagnostics are **mirrored**
+into the bundle, never moved — stderr still carries every line byte for byte (freeze review 05) —
+and cost no tokens, which answers freeze review L2 on its own terms. P5 moved with the reason and
+is now enforced twice: no assertion without a reason, and **no item naming an assertion the bundle
+does not carry**. The shape is frozen by `schema/bundle-v2.schema.json`, the single source, with a
+conformance test that fails when code and schema disagree — the discipline `KIND_ORDER` earned by
+living in three places with nothing forcing agreement. **Nothing discovered changed**: the M26
+reproduction emits the same 22 items in the same order for the same 562 tokens. The ~90 committed
+v1 bundles are frozen at v1 and are never translated; comparing across the boundary means
+re-running.
 
 **ADR-A023 accepted** — a body that keeps its signature but changes what *kind* of value it
 returns is a caller question. `return $query->get();` becoming `return $query->first();` inside

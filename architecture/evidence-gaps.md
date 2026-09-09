@@ -40,7 +40,7 @@ design:
 1. **Does supplied context improve a review?** Untested. No module weights, ranks, or predicts
    usefulness.
 2. **Is the false-positive rate tolerable?** Never scored. Nothing in the tool suppresses or
-   trims items to look precise; precision is measured from `assertion_kind` after the fact.
+   trims items to look precise; precision is measured from each assertion's `kind` after the fact.
 3. **Does a flag capture most of reverse-caller's value?** Never measured. Both levers are recorded
    per item so a scored run can compare them; neither is treated as equivalent.
 4. **Is the move-set bounded?** Rests on four polished commits. The extractor set is closed
@@ -84,7 +84,7 @@ them for evidence.
 |---|---|---|---|
 | AA1 | `--max-call-sites` default `20` | [03-interfaces](03-interfaces.md), [ADR-A006](decisions/ADR-A006-grep-not-graph.md) | A bound is required by P7/P10; the number is invented. Exp 4 gives no count |
 | AA2 | A Markdown writer exists alongside JSON — and is what justifies the `BundleWriter` interface | Adapters | Supported only indirectly: the ROADMAP calls the output something "a human … pastes alongside the diff". The spec leaves serialisation open. Dropping Markdown would also drop the interface |
-| AA3 | `assertion_kind` on every bundle item | [03-interfaces](03-interfaces.md) | R4 requires payload, reason, lever. Machine-readable per-move attribution is an addition; the *reason* field is what the research requires for measurability |
+| AA3 | a `kind` on every assertion the bundle carries | [03-interfaces](03-interfaces.md) | R4 requires payload, reason, lever. Machine-readable per-move attribution is an addition; the *reason* field is what the research requires for measurability. It moved from the item to the assertion in [A024](decisions/ADR-A024-bundle-contract-v2.md); the attribution it buys is unchanged |
 | AA4 | The characters-per-token ratio | [ADR-A007](decisions/ADR-A007-token-estimate.md) | Adequate for a coarse comparative claim; unmeasured |
 | AA5 | Premises `unresolved-reference`, `caller-search-failed` and `call-sites-truncated` | [ADR-A009](decisions/ADR-A009-premise-catalogue.md) | Derived from P10, not from a finding. Correct in spirit; no experiment earned them. `caller-search-failed` was added at freeze review 06 under the same standing |
 | AA6 | PHP 8.2 and zero runtime dependencies | [ADR-A001](decisions/ADR-A001-php-cli-zero-dependencies.md) | Strongly consistent with the evidence (PSR-4 map input; four PHP commits) but the research never names a language |

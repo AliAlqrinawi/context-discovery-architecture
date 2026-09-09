@@ -55,7 +55,10 @@ a real filesystem. The tests worth naming up front, because they encode the evid
 | `ChangedReturnContractAssertionExtractorTest` | All four conditions of [ADR-A023](decisions/ADR-A023-changed-return-contract.md) must hold together; each negative control removes exactly one. An added return the region's span does not contain yields nothing |
 | `ChangedReturnContractHunkOffsetTest` | Driven by real `git diff` output: the member named is the one containing the changed return, whether the hunk opens between two members or inside the previous one |
 | `BundleItemTest` | Constructing an item without a reason or a lever is rejected (P5) |
-| `BudgetEnforcerTest` | Over-budget drops follow the `ItemPriority` order stated in [01-architecture §3.4](01-architecture.md), banding from `assertion_kind` + `lever` alone; every drop is recorded (P7) |
+| `BudgetEnforcerTest` | Over-budget drops follow the `ItemPriority` order stated in [01-architecture §3.4](01-architecture.md), banding from the assertion's `kind` + the item's `lever` alone; every drop is recorded (P7) |
+| `BundleSchemaConformanceTest` | `schema/bundle-v2.schema.json` is the single source: every kind, lever and diagnostic type is asserted **both ways** against the code, the fixed order is asserted against `BundleAssembler`, and real output plus the golden M26 fixture are validated against the schema ([ADR-A024](decisions/ADR-A024-bundle-contract-v2.md)) |
+| `BundleTest` | An item naming an assertion the bundle does not carry is rejected on construction — P5 surviving the reason's move onto the assertion |
+| `PolicyVersionGuardTest` | `run.policy_version` is hashed against the classes it claims to describe, so a rule change without a version bump fails |
 | `OwnFileAssertionExtractorTest` (second case) | A `$this->method(` sibling yields `SameFileReference`, never `NamedReference`; a cross-file class yields `NamedReference`, never `SameFileReference` |
 | `AssumptionWriterTest` | One statement per catalogue premise; an unknown premise is impossible to construct (A009) |
 | `UnverifiablePremiseAssertionExtractorTest` | One case per trigger in [ADR-A009](decisions/ADR-A009-premise-catalogue.md): each trigger present ⇒ exactly one premise; each trigger absent ⇒ none. Experiment 2's trace-logging shape yields zero premises |

@@ -19,7 +19,8 @@ context-discovery/
 │   ├── Domain/
 │   │   ├── Diff/{Diff,ChangedFile,ChangedRegion,ChangedMember}.php
 │   │   ├── Assertion/{Assertion,AssertionKind,ResolvedAssertion}.php
-│   │   ├── Bundle/{Bundle,BundleItem,Lever,Provenance,DroppedItem}.php
+│   │   ├── Bundle/{Bundle,BundleAssertion,BundleItem,Diagnostic,RunMetadata,
+│   │   │          ContractVersion,Lever,Provenance,DroppedItem}.php
 │   │   └── Source/{SourceSlice,CallSite}.php
 │   ├── Ports/
 │   │   ├── SourceRepository.php

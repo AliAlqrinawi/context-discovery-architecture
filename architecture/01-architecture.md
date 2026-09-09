@@ -66,7 +66,7 @@ inward only ([02-project-structure.md](02-project-structure.md) §4).
 |---|---|---|
 | `Domain\Diff` | Immutable value types: `Diff`, `ChangedFile`, `ChangedRegion`, `ChangedMember` (name + old/new signature). Knows nothing about diff *text*. | R1 |
 | `Domain\Assertion` | `Assertion` (kind, subject, origin region, human-readable claim) and `AssertionKind`: `SameFileSymbolAbsence`, `SameFileReference`, `NamedReference`, `ChangedSignature`, `ChangedReturnContract`, `UnverifiablePremise` — one kind per move, so a kind always names its resolver and its priority band. The core domain concept — the diff's *claims*, not its files. Plus `ResolvedAssertion` — assertion + lever + either slices or a statement — the single value handed from resolution to assembly. | P1, ADR-002 |
-| `Domain\Bundle` | `Bundle` (ordered items, budget, used tokens, drops), `BundleItem` (payload, reason, lever, provenance), `Lever` enum (`Fetched`\|`Flagged`), `Provenance` (path, member, line span), `DroppedItem` (reason, note). Enforces the invariant: **no item without a reason and a lever**. | R4, P5 |
+| `Domain\Bundle` | `Bundle` (claims, ordered items, diagnostics, drops, run metadata), `BundleAssertion` (id, kind, subject, reason, origin), `BundleItem` (assertion id, lever, provenance, payload, tokens), `Diagnostic`, `RunMetadata`, `ContractVersion`, `Lever` enum (`Fetched`\|`Flagged`), `Provenance` (path, member, line span), `DroppedItem`. Enforces P5 twice: **no assertion without a reason**, and **no item naming an assertion the bundle does not carry** ([ADR-A024](decisions/ADR-A024-bundle-contract-v2.md)). | R4, P5 |
 | `Domain\Source` | `SourceSlice` (path, member, line span, text) — the minimal fetched payload. | R2 |
 
 ### 3.2 Ports (interfaces only, no logic)

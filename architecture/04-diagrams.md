@@ -27,7 +27,7 @@ flowchart LR
   end
 
   subgraph OUT2["Outside · outputs"]
-    JB["Context bundle · JSON (bundle_version 1)"]
+    JB["Context bundle · JSON (bundle_version 2)"]
     MB["Context bundle · Markdown"]
     DIAG["Diagnostics · stderr"]
   end
