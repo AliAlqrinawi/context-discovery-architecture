@@ -25,12 +25,23 @@ budget with a visible drop list. It does not review, judge, score, or call a mod
 | 3 | [03-interfaces.md](03-interfaces.md) | Public interfaces (CLI contract, bundle schema) and internal interfaces (port signatures) |
 | 4 | [04-diagrams.md](04-diagrams.md) | High-level, request flow, Context Discovery pipeline, module dependency |
 | 5 | [05-traceability.md](05-traceability.md) | Every module → requirement → experiment. Nothing untraceable. |
-| 6 | [06-acceptance.md](06-acceptance.md) | The acceptance test: bundles reproduced against the four Phase 0 keys |
-| 7 | [decisions/](decisions/) | ADR-A001…A024 — the architecture decisions, with evidence and rejected alternatives |
+| 6 | [06-acceptance.md](06-acceptance.md) | The acceptance strategy: keyed synthetic fixtures, the Laravel baseline, and the golden bundle — the Phase 0 gate itself is retired (ADR-A025) |
+| 7 | [decisions/](decisions/) | ADR-A001…A025 — the architecture decisions, with evidence and rejected alternatives |
 | 8 | [evidence-gaps.md](evidence-gaps.md) | What the research repository does *not* settle, the architecture's response, and the fourteen recorded architectural assumptions |
 | 9 | [REVIEW-freeze-01.md](REVIEW-freeze-01.md) · [02](REVIEW-freeze-02.md) · [03](REVIEW-freeze-03.md) · [04](REVIEW-freeze-04.md) · [05](REVIEW-freeze-05.md) · [06](REVIEW-freeze-06.md) | The freeze reviews: findings, corrections applied, the freeze verdict, the two implementation blockers closed, the ACP-01 patch, the empty-result distinction, and the per-resolver failure premise |
 
 ## Status
+
+**ADR-A025 accepted** — the Phase 0 acceptance gate is **retired, not faked**. Its four tests
+failed on every run from M10 to M27 because the commits they grade against live in a private
+codebase and the research carries no patch text: the fixtures were never present, not lost, and
+the harness rightly refused to invent them. A gate that cannot open is not a gate — it is four red
+tests that train every reader to look past red. The behaviour the keys describe is asserted by
+named tests that run; the one claim with no home elsewhere (experiment 02's precision claim) now
+has `SelfContainedDiffTest`; the exit-code contract keeps its only test in `ProcessContractTest`;
+the keys themselves are preserved as documentation at `docs/research/phase0-keys/`. The M26
+reproduction's input diff — which had lived only in `/tmp` and was lost between sessions — is now
+committed beside its golden output. No production file changed.
 
 **ADR-A024 accepted** — the bundle contract is frozen at **`bundle_version` 2**. It states each
 claim once in `assertions[]` and has the evidence point back by `assertion_id`: the M26

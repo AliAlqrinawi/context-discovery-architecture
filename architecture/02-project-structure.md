@@ -61,13 +61,14 @@ context-discovery/
 ├── tests/
 │   ├── Unit/                            # mirrors src/ one-to-one
 │   ├── Acceptance/
-│   │   ├── ExperimentKeyTest.php         # the Phase 0 acceptance test (06-acceptance.md)
+│   │   ├── ProcessContractTest.php       # exit codes 0/1/2, as a process (03-interfaces.md §1)
+│   │   ├── SelfContainedDiffTest.php     # a trace-logging diff yields an almost-empty bundle
+│   │   ├── BundleSchemaConformanceTest.php # the v2 schema is the single source (ADR-A024)
 │   │   └── fixtures/            # expected-context.md shipped;
 │   │       │                     # diff.patch is operator-supplied
-│   │       ├── experiment-01/{diff.patch, expected-context.md}
-│   │       ├── experiment-02/{diff.patch, expected-context.md}   # expects an almost-empty bundle
-│   │       ├── experiment-03/{diff.patch, expected-context.md}
-│   │       └── experiment-04/{diff.patch, expected-context.md}
+│   │       ├── golden/{m26.diff, m26-bundle.v2.json}          # the recorded v2 reproduction, input beside output
+│   │       ├── experiment-NN/{diff.patch, repo/, answer-key.json}  # keyed synthetic fixtures (14, 15, 16 are run)
+│   │       └── laravel-m1/                                   # ten scenarios × three variants, recorded baseline
 │   └── Fakes/                           # in-memory port doubles; no filesystem in unit tests
 └── docs/
     └── architecture/                    # copy of this contract; its header names the

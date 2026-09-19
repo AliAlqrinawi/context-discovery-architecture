@@ -1,44 +1,34 @@
 # 06 · Acceptance and Test Strategy
 
-The acceptance test is not invented here. It is stated in
-`docs/03-phase1/implementation-spec.md`: Phase 1 is done when, for all four Phase 0 commits, the
-tool's bundle reproduces the **minimum-context list** in that commit's experiment file — fetching
-the fetch-type items and flagging the flag-type ones — within budget.
+The acceptance criterion was stated in `docs/03-phase1/implementation-spec.md`: Phase 1 is done
+when, for all four Phase 0 commits, the tool's bundle reproduces the **minimum-context list** in
+that commit's experiment file. That criterion binds the tool to four inputs this repository never
+had — the commits live in a private codebase and the research documents carry no patch text — so
+the harness built for it failed four tests on every run from M10 to M27 and was **retired, not
+faked**, by [ADR-A025](decisions/ADR-A025-the-phase-0-gate-is-retired-not-faked.md).
 
-## 1 · The acceptance harness
+## 1 · The acceptance strategy
 
-`tests/Acceptance/ExperimentKeyTest.php` runs the real command against four fixtures. Each fixture
-directory holds an `expected-context.md` transcribed from the experiment file's step 4 — nothing more
-is invented — plus the commit's `diff.patch`.
+Three kinds of test carry the acceptance load now, each of which actually runs:
 
-**Prerequisite: the four diffs are operator-supplied.** The research repository contains no patch
-text; the experiments describe commits in a private Laravel + Plaid codebase. This project therefore
-ships the expectation files only. Each `diff.patch` must be exported from that codebase by the
-operator before the acceptance test can run, and the harness **fails loudly** —
-`fixture diff absent — acceptance not run` — rather than passing or skipping quietly. Fabricating a
-diff would grade the tool against invented ground truth, which is the one thing the answer-key
-method exists to prevent (ADR-001).
-
-**Each expectation entry is marked `fetch-expected` or `flag-satisfied`.** An experiment's step-4
-minimum-context list describes what a *human* assembled by hand, so some entries name a source the
-tool is not permitted to fetch. The implementation spec settles how to score those: flags count "as a
-catch for the flag-type findings (e.g. the transaction assumption)". The expectation files therefore
-carry the mark, and the harness compares each entry against it. Without the mark, the acceptance
-contract demands output the implementation contract forbids — the two must agree, and the research
-says which way.
-
-| Fixture | Expected bundle (from the experiment file) | Checks |
+| Kind | Where | What it grades |
 |---|---|---|
-| `experiment-01` | `fetch-expected`: `use` block + `syncFromResponse` body (`same_file_symbol_absence`); `upsertFromPlaid` from the same repository file (`same_file_reference`, band 2); the `PlaidAccount` model surface — `forItem`, `official_name`, fillable/casts (`named_reference`, band 4). `flag-satisfied`: the caller of `syncFromResponse` — the transaction question, resolved by the `surrounding-transaction` premise, because no signature changed and R3 restricts the caller grep to changed signatures | Recall of all four findings; missing-import assertion present; the transaction item has `lever: flagged`; **no** caller grep was performed |
-| `experiment-02` | **Almost empty.** At most nothing. | Precision: pulling the `PlaidAccount` model "just in case" **fails** the test |
-| `experiment-03` | `flag-satisfied`: cache-store, schema-index and trashed-data premises (X3 — no config/migration fetch in Phase 1), each fired by its trigger in [ADR-A009](decisions/ADR-A009-premise-catalogue.md). `fetch-expected`: `ExchangePublicTokenRequest` and the route group only if named in the diff | Flag texts present and attributed; no dedicated config resolver invoked |
-| `experiment-04` | `fetch-expected`: `PlaidClient::createLinkToken` slice; `PlaidItemStatus` enum slice; call sites of `reactivate(` under `app/` (a real signature change, so the grep runs here) | Reverse-caller item present with call-site provenance; no false extra fetches on the clean parts; **no premise emitted** — this fixture is the precision guard for the transaction trigger |
+| **Keyed synthetic fixtures** | `experiment-14`, `-15`, `-16` under `tests/Acceptance/fixtures/`, each with a hand-written `answer-key.json`, a `diff.patch` and a checked-in post-image `repo/` — run by `ProjectSurfaceFallbackAcceptanceTest`, `OriginDoesNotChangeOutcomeTest`, `DuplicateSliceIdentityTest` | the whole command against a key written **before** the run (ADR-001), on inputs the repository holds |
+| **The Laravel baseline** | `laravel-m1`: ten scenario diffs against three repository variants, with `answer-key.json` and a recorded `baseline-v0.1.0.json` — run by `LaravelFixtureBaselineTest` | what the tool *should* produce and what it *does* produce, kept as two checkable things; byte-identical determinism across runs |
+| **The golden bundle** | `fixtures/golden/m26.diff` + `m26-bundle.v2.json` — run by `BundleSchemaConformanceTest` | the published contract: schema conformance of real output, the closed sets both ways, and a recorded end-to-end artefact whose input is committed beside it |
 
-Two properties are asserted for every fixture: **determinism** (two runs, byte-identical output — which is why `filesUnder()` and call sites are lexicographically ordered)
+The Phase 0 answer keys are preserved as documentation at `docs/research/phase0-keys/` in the CLI
+repository. The claims they make are asserted by named tests — every premise, the zero-call-site
+negative, changed-signature call sites, named references — and the one claim that had no home
+elsewhere, experiment 02's *"pulling the model just in case is a precision failure"*, is
+`SelfContainedDiffTest`. The exit-code contract the harness also carried is `ProcessContractTest`.
+
+Two properties are asserted for every fixture that runs: **determinism** (two runs, byte-identical
+output on both streams — which is why `filesUnder()` and call sites are lexicographically ordered)
 and **budget honesty** (`used_tokens ≤ budget_tokens`, and every omission appears in `dropped[]`).
 
-Recall and precision are *reported by the harness as counts against the expectation file*, not
-graded into a pass/fail score by the tool — the tool judges nothing (P6). A human reads the table.
+Recall and precision are *reported as counts against a key*, not graded into a pass/fail score by
+the tool — the tool judges nothing (P6). A human reads the table.
 
 ## 2 · Unit tests
 
