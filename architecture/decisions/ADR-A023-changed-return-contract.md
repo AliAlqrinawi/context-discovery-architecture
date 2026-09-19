@@ -175,9 +175,22 @@ alongside post-image line numbers since the beginning, and `UnverifiablePremiseA
 reads them the same way — but this move is the first to make it load-bearing, which is what obliges
 the contract to be written down.
 
-**Failure is silent in the safe direction.** Pointed at a pre-image tree, the added line is not found,
-no member is named, and no assertion is raised. Pinned by
+**For this move, failure is silent in the safe direction.** Pointed at a pre-image tree, the added
+line is not found, no member is named, and no assertion is raised. Pinned by
 `ChangedReturnContractAssertionExtractorTest::testAnAddedReturnTheSpanDoesNotContainYieldsNothing`.
+
+**Correction (M28).** That sentence was true of this extractor and false of the tool. Every extractor
+reads the same file text, and `OwnFileAssertionExtractor` reads its `use` block: on a pre-image tree
+an import the diff adds is not there, so a symbol the diff uses is claimed as a
+`same_file_symbol_absence` that the post-image would never raise. A pre-image tree can therefore
+**inflate** the bundle with a false claim, not only shrink it — and in a measured run that reads as
+a false positive charged to the engine. `UnverifiablePremiseAssertionExtractor` and
+`OwnFileResolver` scan post-image line numbers as well and can name the wrong member. M28 added a
+run-level check in `DiscoverContext`: when none of the non-blank lines the diff adds is present in
+any changed file, a `post_image_contract_violated` diagnostic is emitted — a count, never a
+threshold, and a diagnostic rather than a flag, since this is an input-contract violation and the
+precedent for that class is `unreadable path`. It fires on no committed fixture: every one was
+verified post-image line by line before the check was written.
 
 ## `bundle_version` stays 1
 

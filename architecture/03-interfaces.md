@@ -34,8 +34,16 @@ context-discover --diff <path|-> --repo <path> --budget <int>
   is a line the tree contains. Extraction reads post-image line numbers against these files
   ([ADR-A023](decisions/ADR-A023-changed-return-contract.md) is the first move to depend on it;
   the harness of [ADR-A022](decisions/ADR-A022-experiments-resolve-at-the-reviewed-commit.md)
-  satisfies it by checking the reviewed commit out into a detached worktree). Pointed at a
-  pre-image tree the tool does not misreport: the added line is not found and nothing is claimed.
+  satisfies it by checking the reviewed commit out into a detached worktree). **A pre-image tree
+  is not merely a smaller bundle: it can be a wrong one.** `OwnFileAssertionExtractor` reads the
+  file's `use` block, so an import the diff adds is not seen and a spurious
+  `same_file_symbol_absence` is claimed; the premise and own-file resolvers scan post-image line
+  numbers and can name the wrong member. The tool therefore checks the contract as a count: when
+  **none** of the non-blank lines the diff adds is present in any changed file, it emits
+  `post-image contract violated` on stderr and a `post_image_contract_violated` entry in
+  `diagnostics[]`. Only that categorical case is stated — a partial count would be a judgement
+  (P6) — and it is a diagnostic, never a flag, because it is an input violation rather than a
+  lookup failing (ADR-A023).
 - Read-only: the tool never writes inside `--repo`.
 - No network, no subprocess, no LLM, no state directory (P9, X5).
 - Diagnostics go to stderr only; the bundle on stdout is always parseable and carries no diagnostics.
