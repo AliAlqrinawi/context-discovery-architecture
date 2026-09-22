@@ -1,6 +1,6 @@
 # ADR-A022 · An experiment resolves against the tree of the commit it is reviewing
 
-- **Status:** Accepted
+- **Status:** Accepted · **Partially superseded by [ADR-A026](ADR-A026-the-harness-places-a-real-vendor-directory.md)** (2026-09-22) — the decision stands; its measured effect and its `vendor/` caveat do not. See the correction note at the end
 - **Date:** 2026-09-06
 - **Phase:** Phase 1 · corrects a **measurement** defect found by M19 and fixed in M20
 - **Implements:** ADR-001's key-first method, P8
@@ -97,3 +97,21 @@ support offline. Recorded as a known limit of every measurement taken this way.
 - `docs/research/M19-scored-review-rerun.md` §6 — where K1 was classified compromised.
 - [ADR-A014](ADR-A014-composer-generated-map-as-location-metadata.md) — why borrowing `vendor/` is
   sound for placement.
+
+---
+
+## Correction · 2026-09-22 · see ADR-A026
+
+The body above is unaltered. [ADR-A026](ADR-A026-the-harness-places-a-real-vendor-directory.md)
+records, with the measurement in M29, that the harness this ADR introduced **never gave the tool a
+`vendor/` it could read**: the symlink under "The residual caveat" was refused whole by
+`LocalSourceRepository`, and every bundle from M20 through M23 was generated with no dependency map.
+
+| Passage above | Status |
+|---|---|
+| **Decision** — resolve against the reviewed commit's own tree | **Stands.** Proof commit `0a6e7d1` is 4 · 449 with and without a vendor |
+| "What it changes, measured" — *"`ec92403` moves from 18 items / 606 tokens to 37 items / 986 tokens … M18's and M19's bundle sizes are therefore understated"* | **Superseded.** With a readable `vendor/` at the commit's tree, `ec92403` is **18 · 606**. The 19 extra items were spurious flags on dependency classes |
+| "The residual caveat" — *"the historical worktree borrows the installed dependencies from the main checkout by symlink"* | **Superseded.** Nothing was borrowed. The caveat's *content* — today's `vendor/` against a historical commit's dependency set — is **real from ADR-A026 on**, and is restated there as the standing limit |
+| Consequences — *"understated, not wrong in direction"* | **Superseded** for M18/M19 bundle sizes. M19's coverage remark about M18 rests on tree drift and stands |
+| Consequences — *"pinned by `HarnessResolvesAtCommitTreeTest`"* | **Overstated.** That test never runs the script. `HarnessPlacesAReadableVendorTest` does |
+| Related — *"ADR-A014 — why borrowing `vendor/` is sound for placement"* | The premise is false; ADR-A014 itself is correct, and its symlink-refusal sentence is the mechanism |

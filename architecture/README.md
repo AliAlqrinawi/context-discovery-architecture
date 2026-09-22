@@ -26,11 +26,24 @@ budget with a visible drop list. It does not review, judge, score, or call a mod
 | 4 | [04-diagrams.md](04-diagrams.md) | High-level, request flow, Context Discovery pipeline, module dependency |
 | 5 | [05-traceability.md](05-traceability.md) | Every module → requirement → experiment. Nothing untraceable. |
 | 6 | [06-acceptance.md](06-acceptance.md) | The acceptance strategy: keyed synthetic fixtures, the Laravel baseline, and the golden bundle — the Phase 0 gate itself is retired (ADR-A025) |
-| 7 | [decisions/](decisions/) | ADR-A001…A025 — the architecture decisions, with evidence and rejected alternatives |
+| 7 | [decisions/](decisions/) | ADR-A001…A026 — the architecture decisions, with evidence and rejected alternatives |
 | 8 | [evidence-gaps.md](evidence-gaps.md) | What the research repository does *not* settle, the architecture's response, and the fourteen recorded architectural assumptions |
 | 9 | [REVIEW-freeze-01.md](REVIEW-freeze-01.md) · [02](REVIEW-freeze-02.md) · [03](REVIEW-freeze-03.md) · [04](REVIEW-freeze-04.md) · [05](REVIEW-freeze-05.md) · [06](REVIEW-freeze-06.md) | The freeze reviews: findings, corrections applied, the freeze verdict, the two implementation blockers closed, the ACP-01 patch, the empty-result distinction, and the per-resolver failure premise |
 
 ## Status
+
+**ADR-A026 accepted** — the experiment harness places `vendor/` in the worktree as a **real
+directory, never a symlink**. From M20 through M23 `bundle-at-commit.sh` symlinked the corpus
+checkout's `vendor/`; `LocalSourceRepository` refuses a symlink whole, so every bundle in those
+milestones was generated with **no dependency map** and every dependency class became a spurious
+*"could not be resolved on disk"* flag. Measured against the harness itself on all seven M20
+commits: the symlinked run is byte-identical, bundle and stderr, to a run with no `vendor/` at all.
+ADR-A022's decision stands; its measured effect does not — `ec92403` is **18 items / 606 tokens**
+with a readable vendor, M18's figure exactly — and its caveat about today's `vendor/` against a
+historical commit is real for the first time. Every conclusion counted from reviewer decisions in
+M19–M23 stands; every size and cost figure from M20 on is wrong; three tasks entered their corpora
+on spurious flags alone. A test now runs the script itself. Errata appended to every affected
+record; nothing rewritten. No production file changed. See the erratum at the end of this file.
 
 **ADR-A025 accepted** — the Phase 0 acceptance gate is **retired, not faked**. Its four tests
 failed on every run from M10 to M27 because the commits they grade against live in a private
@@ -208,3 +221,18 @@ Taken verbatim in spirit from `docs/03-phase1/architecture-principles.md` (P1–
 No SaaS. No AI agents. No event-driven architecture. No plugin system. No multi-language
 support (PHP/Laravel target only — the PSR-4 map is an input). No optimisation before
 measurement (no caches, no parallelism, no indexes). No implementation code in this repository.
+
+---
+
+## Erratum · 2026-09-22 · the harness's `vendor/` was never read
+
+**Source:** [ADR-A026](decisions/ADR-A026-the-harness-places-a-real-vendor-directory.md) ·
+`docs/research/M29-vendor-symlink-correction.md` (implementation repository). The text above is
+unaltered apart from the ADR-A026 status paragraph and the decisions index count.
+
+| Claim (the ADR-A022 status paragraph) | Verdict |
+|---|---|
+| "across M20's corpus the corrected harness produces materially larger bundles, so **M18's and M19's figures are understated rather than inflated**" | **Falsified.** The M20 harness symlinked `vendor/` and the tool refused it whole; the larger bundles were spurious flags on dependency classes. With a readable `vendor/` at the commit's tree, `ec92403` is 18 · 606 — M18's figure exactly |
+| "On that task the correction moves the bundle from 2 items / 221 tokens to 4 / 449" | **Stands.** 4 · 449 with and without a vendor |
+| "Pinned by `tests/Acceptance/HarnessResolvesAtCommitTreeTest.php`" | **Overstated.** That test never runs the script; it pins the idea. `HarnessPlacesAReadableVendorTest` runs the script |
+| The decision: resolve at the reviewed commit's tree | **Stands** |
