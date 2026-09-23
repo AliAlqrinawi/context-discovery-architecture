@@ -43,7 +43,12 @@ not a gate step. The pre-check read all 45 diff-only reviewer cells: **7 named t
 `Controller` → `ApiResponse` path** as their one missing piece, `4411454` by three reviewers in
 three milestones. Decision: no change - the strongest objection, both keys by one author, cannot
 be answered by building. The two questions are separated: fetching an ancestor's slice (closed,
-A010 §4) and whether silence is acceptable (open, P10).
+A010 §4) and whether silence is acceptable (open, P10). **Appendix, same day:** the pre-check
+answers the one-author objection - `ec92403`, E5.4's own commit, was named by a diff-only
+reviewer independently of the key - and **option B becomes the candidate**: verification to a
+fixed point, a citation, no fetch, zero tokens. Option C stays closed; no reviewer asked for the
+slice. Still the experiment step; two prerequisites named (an ADR-A009 statement, the §3.3 forms
+table), nothing built.
 
 **ADR-A026 accepted** — the experiment harness places `vendor/` in the worktree as a **real
 directory, never a symlink**. From M20 through M23 `bundle-at-commit.sh` symlinked the corpus

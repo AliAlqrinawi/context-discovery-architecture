@@ -242,3 +242,64 @@ the silence question (A plus OQ6) separately from the fetch question.
 - Implementation repository: `docs/research/M30`, `M31`; `tests/Acceptance/fixtures/experiment-08`
   rows X8.6 and X8.10; `experiment-19/20/21/22/observations/raw-observations.json` for §6.
 - Backend repository: `docs/keys/held-out-ee5a2e6.json` row H.3; ADR-B002.
+
+---
+
+## Appendix · 2026-09-23 · the pre-check changes the decision
+
+The body above is unaltered. Its "no change" was correct on the evidence it had: at the time it
+was written, the evidence for the gap was two keys by one author. §6's pre-check is the evidence
+it did not have, and this appendix records what that evidence changes.
+
+### What the pre-check found, corrected
+
+- **7 of 45, not 2 of 37.** The figure given when the gate was first opened was a keyword pass
+  over the wrong denominator. Every diff-only cell with a committed raw answer in M17–M22 was
+  then read in full: **45** cells (M17 5, M19 7, M20 7, M21 15, M22 11; M23's 11 have no committed
+  raw answers). Both the numerator and the denominator of the earlier figure were wrong, and both
+  corrections are the author's own.
+- **`4411454` was named by three independent reviewers across three milestones** — M19 K3, M21
+  C04, M22 K03 — each asking for `app/Http/Controllers/Controller.php::error`.
+- **`ec92403` — E5.4's own commit — was named by a diff-only reviewer** (M20 D1, asking for
+  `Controller.php::deleted`) **independently of the key that wrote E5.4.** This answers the
+  one-author objection in §5 directly: the same reference was asked for, on the same commit, by
+  a reviewer who never saw the key and by a key author who never saw the reviewer. The objection
+  stood on the possibility that only one person ever wanted this. That possibility is closed.
+- **Five of the seven abstained** (Q1 CANNOT_TELL) with this as their stated missing piece.
+- **Six of the seven wrote `Controller.php::<member>`**, and `Controller.php` declares nothing at
+  any of those commits. The reviewers' model — "it is on the parent" — is one file short of the
+  truth. Option B's citation, *"declared at `app/Traits/ApiResponse.php:9`; not fetched"*,
+  corrects exactly that error. Option A's flag — *"could not be resolved on disk"* — would leave
+  it standing and add a false sentence beside it.
+
+### Revised decision
+
+> **Option B is now the candidate: ancestry verification to a fixed point through project files,
+> stopping at a dependency boundary, settled with a citation and no fetch, at zero token cost.**
+> **Option C stays closed:** no reviewer asked for the slice. Every one of the seven named a file
+> and a member — a location — and none quoted or asked for a body. What they lacked was the
+> pointer, which is what B supplies and C would exceed.
+
+This is still the gate's **experiment** step. Nothing is built by this appendix. What option B
+needs before it can be built, in order:
+
+1. **A fixed statement for "declared in a project ancestor; not fetched."** The catalogue has no
+   premise or diagnostic for a member found by walking `extends` and `use <Trait>` through project
+   files. ADR-A009 requires a flag's statement to be exactly true of the case it covers and gates
+   every addition on an experiment; that experiment is §7's, and this appendix is its evidence,
+   not its result. **ADR-A009 gated.**
+2. **The recognised-forms table in `01-architecture.md` §3.3.** `$this->m(` to a member the file
+   does not declare is not a recognised form, and `extends Name` is not a recognised class-name
+   position. Both must be added for an assertion to exist at all — cause A in §2 — and the table
+   is a closed interface. **Its own decision, in the interfaces document, not in this ADR.**
+
+Then §7's experiment, with the second author, on the corpus named there, scored against both
+keys. Option B is a candidate, not a decision.
+
+### The caveat, kept
+
+The corpus behind 7/45 over-represents controller commits: M17–M22 selected for non-empty
+bundles, and controllers produce them. **7/45 is not a transferable rate.** It is evidence that
+reviewers who are not the key author name this path unprompted, on four distinct commits; it is
+not evidence of how often they would on a corpus chosen otherwise. §7's experiment adds halaw's
+controller commits for that reason, and the null result stated there still applies.
