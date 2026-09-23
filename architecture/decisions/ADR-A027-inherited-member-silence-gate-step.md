@@ -319,3 +319,17 @@ front of them and were not corrected by it. As an item, option B costs, estimate
 now the S1/S2 split of ADR-A028 §4 - S1 a flagged item, S2 a settled-negative diagnostic - which
 brings the estimate back toward S1's share alone (≈ 120 and ≈ 260 tokens). Still the experiment
 step; still unmeasured.
+
+---
+
+## Correction · 2026-09-23 · `extends Name` is not a prerequisite
+
+**Source:** [ADR-A029](ADR-A029-recognised-forms-gate-step.md) §3. The text above is unaltered.
+
+§9's second row lists *"`$this->m(` to an undeclared member, and the `extends Name` position, in
+the recognised-forms table"*. The second half was the author's error. Option B needs `extends`
+and `use <Trait>` **read as facts** from the changed file during resolution, not **recognised
+as a form** that emits an assertion. Recognising `extends Name` would have admitted 24
+parent-class assertions across the three scored commits, fourteen of them anonymous migration
+classes on a commit whose bundle is correctly empty. Only the `$this->m(` form is a
+prerequisite, and its subject is the calling class (ADR-A029 §2).

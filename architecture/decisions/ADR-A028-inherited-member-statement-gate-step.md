@@ -206,3 +206,20 @@ No new `AssertionKind`. No new lever. No framework table entry.
 - Implementation repository: `src/Discovery/Flagging/AssumptionWriter.php`,
   `src/Pipeline/DiscoverContext.php` (5b, 5c, 5d, `namedReferenceSettlement`),
   `src/Assembly/TokenEstimate.php`.
+
+---
+
+## Correction · 2026-09-23 · `extends Name` is not a prerequisite; the subject is the calling class
+
+**Source:** [ADR-A029](ADR-A029-recognised-forms-gate-step.md) §2–3. The text above is unaltered.
+
+§9's third row lists the `extends Name` position among the recognised forms option B needs. It is
+not one: the walk reads `extends` and `use <Trait>` as facts from the changed file during
+resolution; nothing asserts the clause. Removed as a prerequisite.
+
+§8's "calling class or its parent" is narrowed: the subject of the new form is **the calling
+class's FQCN** — `App\Http\Controllers\Admin\MenuPdfController::success` — never the parent.
+Choosing the parent would pre-resolve a hop inside extraction and be wrong for the own-trait case
+(`PersonalityResource::resolveLocale`, whose parent is `JsonResource` and whose member is in
+`ResolvesLocale`). The backend's subject-matching question (ADR-B002) should be read with this
+narrowing: a key that lists the calling-class subject beside the declaring site is sufficient.

@@ -26,11 +26,26 @@ budget with a visible drop list. It does not review, judge, score, or call a mod
 | 4 | [04-diagrams.md](04-diagrams.md) | High-level, request flow, Context Discovery pipeline, module dependency |
 | 5 | [05-traceability.md](05-traceability.md) | Every module → requirement → experiment. Nothing untraceable. |
 | 6 | [06-acceptance.md](06-acceptance.md) | The acceptance strategy: keyed synthetic fixtures, the Laravel baseline, and the golden bundle — the Phase 0 gate itself is retired (ADR-A025) |
-| 7 | [decisions/](decisions/) | ADR-A001…A028 — the architecture decisions, with evidence and rejected alternatives |
+| 7 | [decisions/](decisions/) | ADR-A001…A029 — the architecture decisions, with evidence and rejected alternatives |
 | 8 | [evidence-gaps.md](evidence-gaps.md) | What the research repository does *not* settle, the architecture's response, and the fourteen recorded architectural assumptions |
 | 9 | [REVIEW-freeze-01.md](REVIEW-freeze-01.md) · [02](REVIEW-freeze-02.md) · [03](REVIEW-freeze-03.md) · [04](REVIEW-freeze-04.md) · [05](REVIEW-freeze-05.md) · [06](REVIEW-freeze-06.md) | The freeze reviews: findings, corrections applied, the freeze verdict, the two implementation blockers closed, the ACP-01 patch, the empty-result distinction, and the per-resolver failure premise |
 
 ## Status
+
+**ADR-A029 accepted** — the last prerequisite gate for option B, `01-architecture.md` §3.3's
+recognised-forms table, opened and **nothing added**. The form: `$this->m(` where `m` is not
+declared in the file, subject **the calling class's FQCN** (never the parent — that pre-resolves
+a hop and is wrong for the own-trait case; ADR-A028's wording narrowed), home
+`NamedReferenceAssertionExtractor`, the `imports === []` gate not applying to it. `extends Name`
+is **not** a prerequisite — the walk reads it as a fact — and would have admitted 24 parent
+assertions, fourteen of them anonymous migration classes; ADR-A027 and ADR-A028 corrected by
+appended note. Shape 5 is indistinguishable at the table (every D1 test helper's parent is
+`Tests\TestCase`, project code), which turns the S1/S2 split from a preference into an argument.
+Shape 6 stays out. **Three changes must land as one**: the form, the premises and D2 walk, and a
+guard so ADR-A020's surface fallback never targets the origin file — without it the chain is
+Fetched → not found → false flag → the changed file's own surface → the diff duplicated
+(ADR-A018/A019). The ADR-A020 guard is the next gate. The M26 golden would go stale while its
+test stays green — the worst kind of pass; a new golden and a `POLICY` bump are required.
 
 **ADR-A028 accepted** — ADR-A009's gate opened for the statement ADR-A027's option B needs,
 and **nothing built**. The statement must be an **item, not a diagnostic**: the bundle is what
