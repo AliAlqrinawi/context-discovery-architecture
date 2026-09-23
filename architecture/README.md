@@ -26,11 +26,24 @@ budget with a visible drop list. It does not review, judge, score, or call a mod
 | 4 | [04-diagrams.md](04-diagrams.md) | High-level, request flow, Context Discovery pipeline, module dependency |
 | 5 | [05-traceability.md](05-traceability.md) | Every module → requirement → experiment. Nothing untraceable. |
 | 6 | [06-acceptance.md](06-acceptance.md) | The acceptance strategy: keyed synthetic fixtures, the Laravel baseline, and the golden bundle — the Phase 0 gate itself is retired (ADR-A025) |
-| 7 | [decisions/](decisions/) | ADR-A001…A026 — the architecture decisions, with evidence and rejected alternatives |
+| 7 | [decisions/](decisions/) | ADR-A001…A027 — the architecture decisions, with evidence and rejected alternatives |
 | 8 | [evidence-gaps.md](evidence-gaps.md) | What the research repository does *not* settle, the architecture's response, and the fourteen recorded architectural assumptions |
 | 9 | [REVIEW-freeze-01.md](REVIEW-freeze-01.md) · [02](REVIEW-freeze-02.md) · [03](REVIEW-freeze-03.md) · [04](REVIEW-freeze-04.md) · [05](REVIEW-freeze-05.md) · [06](REVIEW-freeze-06.md) | The freeze reviews: findings, corrections applied, the freeze verdict, the two implementation blockers closed, the ACP-01 patch, the empty-result distinction, and the per-resolver failure premise |
 
 ## Status
+
+**ADR-A027 accepted** — ADR-A003's gate opened on the inherited-member gap E5.4 and H.3
+measured, and **closed without a change**. The chain is traced on `v0.2.0`: `$this->success(...)`
+is recognised and then **dropped at `OwnFileAssertionExtractor.php:85`** because `success` is not
+declared in the changed file - it never reaches the depth boundary, and the outcome is silence,
+which P10 rates worst. Nine shapes, two causes (extraction; resolution depth). ADR-A015's
+190-site population was the static form; the `$this->` form is 66 sites in 40 files, 44 of them
+two project traits. Options A-D costed as estimates; option C needs ADR-A010 §4 reopened and is
+not a gate step. The pre-check read all 45 diff-only reviewer cells: **7 named the
+`Controller` → `ApiResponse` path** as their one missing piece, `4411454` by three reviewers in
+three milestones. Decision: no change - the strongest objection, both keys by one author, cannot
+be answered by building. The two questions are separated: fetching an ancestor's slice (closed,
+A010 §4) and whether silence is acceptable (open, P10).
 
 **ADR-A026 accepted** — the experiment harness places `vendor/` in the worktree as a **real
 directory, never a symlink**. From M20 through M23 `bundle-at-commit.sh` symlinked the corpus
