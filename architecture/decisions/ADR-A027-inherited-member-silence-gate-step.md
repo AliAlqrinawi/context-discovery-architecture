@@ -303,3 +303,19 @@ bundles, and controllers produce them. **7/45 is not a transferable rate.** It i
 reviewers who are not the key author name this path unprompted, on four distinct commits; it is
 not evidence of how often they would on a corpus chosen otherwise. §7's experiment adds halaw's
 controller commits for that reason, and the null result stated there still applies.
+
+---
+
+## Correction · 2026-09-23 · option B is not zero tokens
+
+**Source:** [ADR-A028](ADR-A028-inherited-member-statement-gate-step.md). The text above,
+appendix included, is unaltered.
+
+§4 and the appendix describe option B as costing zero tokens. That assumed the statement would
+be a stderr diagnostic. ADR-A028 §1 settles that it must be an **item** - the bundle is what the
+agent acts on, and six of seven reviewers who named this path had `context-diagnostics.txt` in
+front of them and were not corrected by it. As an item, option B costs, estimated: D1 +10 items,
+≈ 505 tokens on a 606-token bundle; ee5a2e6 +8 items, ≈ 405 tokens on 1078. The candidate is
+now the S1/S2 split of ADR-A028 §4 - S1 a flagged item, S2 a settled-negative diagnostic - which
+brings the estimate back toward S1's share alone (≈ 120 and ≈ 260 tokens). Still the experiment
+step; still unmeasured.
