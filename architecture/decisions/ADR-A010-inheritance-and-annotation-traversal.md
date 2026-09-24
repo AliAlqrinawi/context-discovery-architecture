@@ -284,3 +284,40 @@ questions are coupled and should be sequenced deliberately.
 - M0 research and the M1 fixture, in the implementation repository:
   `docs/research/M0-laravel-framework-knowledge.md`,
   `tests/Acceptance/fixtures/laravel-m1/README.md`.
+
+---
+
+## Addendum (2026-09-24) — the D2 trigger fired; D2 is relaxed for verification only
+
+The trigger above — *"an ADR-001-grade experiment exists whose hand-written answer key names a
+member the changed file's directly-referenced class does not declare"* — was met, and recorded
+before anything was built: experiment-05's E5.4 (`App\Traits\ApiResponse::success`, `FETCH`,
+missed in both vendor modes — M30), the ee5a2e6 held-out key's H.3 (written from the diff alone,
+locked, then missed — M31), and the reviewer pre-check in [ADR-A027](ADR-A027-inherited-member-silence-gate-step.md)
+§6 (seven of forty-five diff-only cells named the Controller → ApiResponse path).
+
+**What is relaxed.** D2 — *resolution opens at most one file beyond the changed file* — is relaxed
+for **verification only**, on exactly the terms §1 and §4 set:
+
+- `AncestryResolver` walks `extends` and `use <Trait>` through **project files** to a fixed point
+  and returns a *citation*: declaring type, path, line. It never returns a slice.
+- **§4 holds.** No ancestor's source is fetched into the bundle, on any evidence. The one item S1
+  produces is a flag whose sentence names where the member is declared (ADR-A028 §5).
+- **D1 holds, by construction.** The walk holds a visited-set of resolved type names, constructs
+  no `Assertion`, and depends on no extractor. `Oq1DepthBoundaryTest::testD1HoldsStructurally`
+  still forbids a worklist everywhere in resolution and the pipeline; the new
+  `testTheD2WalkHoldsTypeNamesNotReferences` bounds what the walk may hold and read.
+- **The bound is "to a fixed point", not a hop count.** This ADR rejected an invented bound as
+  AA1-shaped; ADR-A028 §6 names the fail-closed conditions (a dependency, an unplaceable or
+  unreadable type, two declaring traits, a conflict block, a cycle) and each has a test.
+- `vendor/` is never opened on this path. A dependency ancestor is named by FQCN from the
+  `extends` / `use` clause alone and the walk stops (S2).
+
+**What is not relaxed.** `@mixin` and every other annotation stay unread (§4). `NamedReferenceResolver`
+itself still reads only the path the locator placed — `testTheResolverReadsOnlyTheFileTheLocatorPlaced`
+is unchanged — and the walk is reachable only from a fourth-form assertion whose placed path is
+its own origin file.
+
+`evidence-gaps.md` §4's D2 row is closed by this addendum for the verify-only read; the fetch read
+remains an under-build with no motive.
+

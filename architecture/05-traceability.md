@@ -11,7 +11,7 @@ added to it, that is the signal to stop.
 | **R2** | Depth-one named-reference resolution via PSR-4, minimal slice | `Discovery\Extraction\NamedReferenceAssertionExtractor`, `Discovery\Resolution\NamedReferenceResolver`, `Adapters\Autoload\ComposerPsr4ClassLocator`, `Adapters\Php\TokenizerMemberSlicer` | 1, 4 |
 | **R3** | Reverse-caller lookup for a changed member contract (grep) | `Discovery\Extraction\ChangedSignatureAssertionExtractor`, `Discovery\Extraction\ChangedReturnContractAssertionExtractor` ([ADR-A023](decisions/ADR-A023-changed-return-contract.md)), `Discovery\Resolution\CallerResolver`, `Adapters\Search\ScopedGrepCallSiteSearch`. Two triggers, one search: a changed parameter list (Exp 4) or a changed return cardinality (ADR-A023); a caller question that is not a signature change — Exp 1's transaction — is flag-type per `fetch-vs-flag.md` and counts as a catch per the spec's success criteria | 1, 4 |
 | **R4** | Bundle with reason + lever per item, token accounting | `Domain\Bundle\*`, `Assembly\BundleAssembler`, `Assembly\TokenEstimate`, `Adapters\Serialization\*` | method; 1, 3 |
-| **R5** | Flag path for expensive/unknowable dependencies | `Discovery\Extraction\UnverifiablePremiseAssertionExtractor`, `Discovery\Lever\LeverPolicy`, `Discovery\Lever\PremiseCatalogue` (seven premises, one literal trigger each — [ADR-A009](decisions/ADR-A009-premise-catalogue.md)), `Discovery\Flagging\AssumptionWriter` | 1, 3 |
+| **R5** | Flag path for expensive/unknowable dependencies | `Discovery\Extraction\UnverifiablePremiseAssertionExtractor`, `Discovery\Lever\LeverPolicy`, `Discovery\Lever\PremiseCatalogue` (eight premises, one literal trigger each — [ADR-A009](decisions/ADR-A009-premise-catalogue.md); the eighth, `inherited-member-declared`, by [ADR-A028](decisions/ADR-A028-inherited-member-statement-gate-step.md)), `Discovery\Flagging\AssumptionWriter` | 1, 3 |
 
 ## 2 · Discovery move → module → evidence
 
@@ -41,7 +41,7 @@ added to it, that is the signal to stop.
 |---|---|
 | P1 assertion-resolution | `Domain\Assertion` is the only type the pipeline's middle stages accept; there is no "related files" type anywhere. The six kinds partition the six moves one-to-one, so a kind names its resolver and its drop band with no extra field — two of them naming the same resolver, since `ChangedReturnContract` asks R3's question through different evidence (ADR-A023) |
 | P2 two levers | `LeverPolicy` is the single decision point; `Lever` is a required field on every item |
-| P3 depth one | Resolved slices are payload; stage 5 has no path back to stage 3 |
+| P3 depth one | Resolved slices are payload; stage 5 has no path back to stage 3. The one bounded exception is verify-only: `AncestryResolver` opens project ancestors to **cite** a declaration and fetches none of them ([ADR-A010](decisions/ADR-A010-inheritance-and-annotation-traversal.md) D2 addendum, [ADR-A028](decisions/ADR-A028-inherited-member-statement-gate-step.md) §6) |
 | P4 no forward-following | No module reads a resolved file's own `use` block; `ImportFollower` does not exist |
 | P5 self-justifying items | `BundleItem` cannot be constructed without a non-empty reason and a lever |
 | P6 judges nothing | No severity/score type; no LLM port; `ItemPriority` is used only for drops and is documented as not a relevance signal |
@@ -55,7 +55,7 @@ added to it, that is the signal to stop.
 | Excluded | Enforced by |
 |---|---|
 | X1 forward import-following | No module; pipeline shape makes it impossible without adding a stage |
-| X2 depth > 1 / transitive | Same; also no queue or worklist type exists to hold pending references |
+| X2 depth > 1 / transitive | Same; also no queue or worklist type exists to hold pending references. `AncestryResolver`'s visited-set holds resolved **type names**, constructs no assertion, and is bounded by `Oq1DepthBoundaryTest::testTheD2WalkHoldsTypeNamesNotReferences` |
 | X3 config/migration resolver | Not in the module list; the capability appears only as premise-catalogue flags |
 | X4 severity / review | No severity type, no comment type, no ranking beyond drop priority |
 | X5 in-tool LLM | No HTTP client, no API key input, zero runtime dependencies |

@@ -34,6 +34,7 @@ already loads. No new input, no new module, no extra pass.
 | `unresolved-reference` | A `NamedReference` assertion resolved to nothing — no PSR-4 entry, unreadable path, or member not found. **This premise is specific to `NamedReferenceResolver`**; its statement names a named reference, so it may not be reused for another resolver's failure (freeze review 06) | P10 |
 | `caller-search-failed` | A caller search **could not run**: the scope prefix is unreadable or absent. Distinct from zero results, which is a settled answer and yields nothing (freeze review 05) | P10, [ADR-A006](ADR-A006-grep-not-graph.md) |
 | `call-sites-truncated` | A caller search hit `--max-call-sites` | P10, [ADR-A006](ADR-A006-grep-not-graph.md) |
+| `inherited-member-declared` | A `NamedReference` of the fourth form (`$this->m(` to a member the changed file does not declare, [ADR-A029](ADR-A029-recognised-forms-gate-step.md)) whose member `AncestryResolver` found declared in a **project** ancestor — a trait the class uses, its parent, or a trait a parent uses — with the walk ending in project code (S1). When the walk stops at a boundary instead (a dependency, an unplaceable or unreadable type, two declaring traits, a conflict block, a cycle) the answer is a settled negative on stderr and **no premise** (S2, [ADR-A028](ADR-A028-inherited-member-statement-gate-step.md) §4, §6). When nothing in the project ancestry declares it, `unresolved-reference` fires as before, exactly true | E5.4, H.3; seven diff-only reviewers ([ADR-A027](ADR-A027-inherited-member-silence-gate-step.md) §6) |
 
 **A premise exists only where an unverified premise exists.** Every trigger above marks something the
 run could not settle: a caller not checked, a store not inspected, a migration not read, a lookup that
@@ -69,6 +70,12 @@ One fixed statement per premise:
 | `unresolved-reference` | "ASSUMPTION: named reference could not be resolved on disk; contract unverified" | P10 |
 | `caller-search-failed` | "ASSUMPTION: callers of this signature could not be searched; scope unreadable" | P10 / A006 |
 | `call-sites-truncated` | "ASSUMPTION: additional call sites exist beyond the search bound; not all verified" | P10 / A006 |
+| `inherited-member-declared` | "ASSUMPTION: {member}() is not declared in {class}{ or in its parent(s) {walked}}; it is declared in {trait\|parent} {declaring FQCN} at {path}:{line}{, used by the class itself \| that parent \| {applier}}; body not fetched, contract unverified" — a **template**, the catalogue's first: every slot is filled from a fact the walk read (a name, a path, a line), the "or in its parent" clause appears only when a parent was actually walked, and the rendering is `AssumptionWriter::inheritedMemberStatement()` | ADR-A028 §5; ADR-A027 §6 |
+
+The eighth statement is the one exception to "fixed": its slots are bounded and its values are file
+contents, so it is deterministic (P8) and not free text — the property the fixed-statement rule
+exists to protect. Whether a templated `items[].payload` is an additive change to the bundle
+contract is [ADR-A024](ADR-A024-bundle-contract-v2.md)'s question, not this one's (ADR-A028 §7).
 
 Each flag carries the reason (which assertion it resolves) and provenance: the origin **path** and
 line span always, and a **member** only when the failing assertion already names one (e.g.
@@ -112,3 +119,21 @@ path.
 - Adding a premise requires an experiment, a catalogue entry, and an edit to this ADR.
 - If Experiment 5 raises a premise the catalogue lacks, the bundle will show the gap instead of
   papering over it — the intended failure mode ([ADR-A003](ADR-A003-closed-move-set.md)).
+
+---
+
+## Addendum (2026-09-24) — the eighth premise
+
+`inherited-member-declared` entered the catalogue with option B ([ADR-A027](ADR-A027-inherited-member-silence-gate-step.md)
+appendix, [ADR-A028](ADR-A028-inherited-member-statement-gate-step.md), [ADR-A029](ADR-A029-recognised-forms-gate-step.md)),
+in the order this ADR requires: an experiment (E5.4 in experiment-05, H.3 in the ee5a2e6 held-out
+key, and the pre-check that found seven of forty-five diff-only reviewer cells naming the same
+path), a catalogue entry, and this edit. `POLICY` moved from `2` to `3` with it, so scored runs
+across the boundary are compared knowingly.
+
+S2 — the ancestry leaves project code before declaring the member — is deliberately **not** a
+premise. Its statement would be a true sentence about a test-helper population no key asks for and
+no reviewer named (ADR-A028 §4); it is a settled negative on stderr, like a caller search with zero
+call sites, and this ADR's rule that a premise exists only where an unverified premise a reader
+needs exists is what keeps it out.
+

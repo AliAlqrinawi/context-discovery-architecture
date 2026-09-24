@@ -89,36 +89,50 @@ estimation perform no I/O and have one implementation each, so they are plain cl
 |---|---|---|
 | `Discovery\Parsing\UnifiedDiffParser` | Unified diff text → `Domain\Diff`. A pure class, not a port: no I/O, one implementation. Old signatures come from the hunk's removed lines; a rename is treated as two members and is not tracked. | R1 |
 | `Discovery\Extraction\AssertionExtractor` | Facade. Runs the five extractors over every changed region in a fixed order and returns a deterministic, de-duplicated `Assertion[]`. | spec resp. 3 |
-| `…\OwnFileAssertionExtractor` | Reads the changed file's own text: emits `SameFileSymbolAbsence` for a symbol used in the region but missing from the `use` block, and `SameFileReference` for sibling members the region calls (`$this->method(`). | R1; Exp 1 (missing `Log`, `upsertFromPlaid`) |
-| `…\NamedReferenceAssertionExtractor` | Emits `NamedReference` for classes/members the region names and that are **not** defined in the changed file — model, client method, enum. Same-file siblings belong to `OwnFileAssertionExtractor`. Depth one; **does not** follow the resolved file's own references (P3). | R2; Exp 1, 4 |
+| `…\OwnFileAssertionExtractor` | Reads the changed file's own text: emits `SameFileSymbolAbsence` for a symbol used in the region but missing from the `use` block, and `SameFileReference` for sibling members the region calls (`$this->method(`) **and the file declares**. | R1; Exp 1 (missing `Log`, `upsertFromPlaid`) |
+| `…\NamedReferenceAssertionExtractor` | Emits `NamedReference` for classes/members the region names and that are **not** defined in the changed file — model, client method, enum, and a `$this->method(` the file does not declare (subject: the calling class). Declared same-file siblings belong to `OwnFileAssertionExtractor`. Depth one; **does not** follow the resolved file's own references (P3). | R2; Exp 1, 4; E5.4, H.3 ([ADR-A029](decisions/ADR-A029-recognised-forms-gate-step.md)) |
 | `…\ChangedSignatureAssertionExtractor` | Compares old/new signatures of members touched by the diff; emits `ChangedSignature` when arity or parameter shape changed. | R3; Exp 4 (`reactivate`) |
 | `…\ChangedReturnContractAssertionExtractor` | Compares the terminal call of a removed and an added `return` against `FrameworkKnowledge`'s closed cardinality table; emits `ChangedReturnContract` when the classes differ and the added return is the member's **own**. Reads the added line's own post-image number, never the hunk's start, and rejects a return that belongs to a closure inside the member rather than to the member. | R3; [ADR-A023](decisions/ADR-A023-changed-return-contract.md) |
 | `…\UnverifiablePremiseAssertionExtractor` | Emits `UnverifiablePremise` from a **closed, evidence-derived catalogue** of premises a file cannot settle: surrounding-transaction, atomic-lock-store, schema-index-support, data-state-after-behaviour-change (plus three P10 failure premises, one per lookup that can fail). Each has a single literal **trigger** — a premise is emitted if and only if its trigger is present ([ADR-A009](decisions/ADR-A009-premise-catalogue.md)); there is no inference path. Adding a premise, or a trigger, requires a new experiment. | R5; Exp 1, 3 |
 | `Discovery\Lever\LeverPolicy` | One pure function implementing `fetch-vs-flag.md`'s decision rule: named + single + depth-one on disk → `Fetched`; expensive (reverse-graph) or unknowable (runtime/data) → `Flagged`. No heuristics beyond that rule. | R5, P2 |
 | `Discovery\Resolution\OwnFileResolver` | Fetches the region's own `use` block, the enclosing member, and named sibling members. | R1 |
-| `Discovery\Resolution\NamedReferenceResolver` | Locates the class (`ClassLocator`), slices the single named member or the model/enum surface (`MemberSlicer`). Unresolved → returns nothing and hands the assertion back for flagging (P10). | R2 |
+| `Discovery\Resolution\NamedReferenceResolver` | Locates the class (`ClassLocator`), slices the single named member or the model/enum surface (`MemberSlicer`). Unresolved → returns nothing and hands the assertion back for flagging (P10). For the fourth form (below) it asks `AncestryResolver` where the member is declared before the flag is written. | R2 |
+| `Discovery\Resolution\AncestryResolver` | For a member the calling class does not declare: walks `extends` and `use <Trait>` through **project files** to a fixed point and returns a *citation* — declaring type, path, line — or the boundary where it stopped (a dependency, an unplaceable or unreadable type, two declaring traits, a conflict block, a cycle). Verify-only: nothing it opens is fetched and nothing it opens produces an assertion (ADR-A010 D2 relaxed for verification, D1 untouched). | [ADR-A028](decisions/ADR-A028-inherited-member-statement-gate-step.md) §6 |
 | `Discovery\Resolution\CallerResolver` | For a `ChangedSignature` or a `ChangedReturnContract`, greps call sites within the configured scope and returns the matching lines. Bounded: scope prefix, max call sites, no recursion. A search that completes with **zero** call sites is a successful negative — no item, no flag, one stderr diagnostic (freeze review 05). A search that **cannot run** (unreadable or absent scope) is a failure ⇒ the `caller-search-failed` premise (freeze review 06). | R3 |
 | `Discovery\Flagging\AssumptionWriter` | Renders one flagged assertion into a one-line `ASSUMPTION: …` payload plus its reason. Text templates only, one per catalogue premise. | R5 |
 
 #### Reference forms recognised by `NamedReferenceAssertionExtractor`
 
-R2's recall is defined by this closed list — the **cross-file** forms only. A reference to a member of
-the changed file itself (`$this->method(`, e.g. Exp 1's `upsertFromPlaid`) is a `SameFileReference`
-emitted by `OwnFileAssertionExtractor`: research context type 1, not type 2
-(`docs/02-discovery/context-types.md`). Each form below is required by a finding; any other form
-produces **no** assertion — no inference, no guessing (ADR-A003).
+R2's recall is defined by this closed list — the **cross-file** forms only. A reference to a member
+the changed file itself **declares** (`$this->method(`, e.g. Exp 1's `upsertFromPlaid`) is a
+`SameFileReference` emitted by `OwnFileAssertionExtractor`: research context type 1, not type 2
+(`docs/02-discovery/context-types.md`). The same call to a member the file does **not** declare is
+the fourth form below — its declaration is in another file by construction. Each form is required
+by a finding; any other form produces **no** assertion — no inference, no guessing (ADR-A003).
 
 | Form | Example from the evidence | Earned by |
 |---|---|---|
 | `Name::member` — static or enum member access | `PlaidItemStatus::REVOKED` | Exp 4 |
 | `$property->method(` where the property's declared type resolves through the file's `use` block | `$this->plaidClient->createLinkToken(` | Exp 4 |
 | A class name in a `new`, type, or static-call position, resolved through the `use` block | `PlaidAccount` model surface | Exp 1 |
+| `$this->method(` to a member the changed file does not declare; the subject is the **calling class** (the file's own FQCN), never the parent — the region names `$this`, and the parent is a fact resolution reads | `$this->success(` in a controller using `ApiResponse` | E5.4, H.3; seven reviewers ([ADR-A027](decisions/ADR-A027-inherited-member-silence-gate-step.md) §6, [ADR-A029](decisions/ADR-A029-recognised-forms-gate-step.md)) |
 
-Resolution is depth one: the resolved file's own references are never read (P3, P4).
+The fourth form needs no import, so it is not gated by an empty `use` block. `parent::`, `self::`
+and `static::` are **not** forms (ADR-A029 §4), and neither is `extends Name`: the parent is read by
+resolution, not asserted by extraction. An anonymous class has no FQCN to be the subject and yields
+nothing.
+
+Resolution is depth one: the resolved file's own references are never read (P3, P4). The fourth
+form's resolution is the one bounded exception, and it is verify-only: `AncestryResolver` walks
+`extends` / `use <Trait>` through project files to say **where** the member is declared, fetches
+nothing it opens, and settles as S1 (a flag citing the declaration —
+`inherited-member-declared`) or S2 (a stderr diagnostic when the ancestry leaves project code
+first) — [ADR-A028](decisions/ADR-A028-inherited-member-statement-gate-step.md) §4–§6,
+[ADR-A010](decisions/ADR-A010-inheritance-and-annotation-traversal.md) D2 addendum.
 
 #### Premise triggers
 
-The parallel closed list for `UnverifiablePremise` — six premises, one literal trigger each — is
+The parallel closed list for `UnverifiablePremise` — eight premises, one literal trigger each — is
 specified in [ADR-A009](decisions/ADR-A009-premise-catalogue.md). Two properties matter
 architecturally: every trigger reads only the changed region and the changed file's own text (R1's
 existing load, no new input), and nothing outside the list can produce a premise. That is what keeps

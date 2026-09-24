@@ -32,6 +32,20 @@ budget with a visible drop list. It does not review, judge, score, or call a mod
 
 ## Status
 
+**Option B built (2026-09-24)** — the form, the premises and the D2 walk landed together in the
+engine, as ADR-A029 §6 requires, after the ADR-A020 origin-file guard landed alone. What moved in
+the specs: `01-architecture.md` §3.3 (a fourth row; the same-file prose narrowed to *a member the
+file declares*; `AncestryResolver` in the module table), `03-interfaces.md` (the S1 stderr line
+with its flag item, the S2 line without one, `diagnostics[]` unchanged), `05-traceability.md`
+(P3, X2 and R5 rows), ADR-A009 (eighth premise, its trigger, its template — the catalogue's
+first), ADR-A010 (addendum: the trigger fired; D2 relaxed for verification only, §4 and D1
+untouched), `evidence-gaps.md` §4 (the fetch read stays an under-build). `POLICY` is `3`; the
+M26 golden was regenerated: 3 assertions, 23 items, 624 tokens, from 2 / 22 / 562. **One question
+is open at ADR-A024** and is not decided here: whether S1's templated `items[].payload` is
+additive under the compatibility table (no `bundle_version` bump) or a change of meaning for
+`lever: flagged` (a bump). The engine carries `bundle_version` 2 as the reversible default until
+it is answered.
+
 **ADR-A029 accepted** — the last prerequisite gate for option B, `01-architecture.md` §3.3's
 recognised-forms table, opened and **nothing added**. The form: `$this->m(` where `m` is not
 declared in the file, subject **the calling class's FQCN** (never the parent — that pre-resolves

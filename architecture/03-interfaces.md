@@ -137,12 +137,18 @@ subject recoverable only by parsing prose.
 | `dropped[]` | Every budget drop, with the reason its assertion states. Empty array when nothing was dropped. Never omitted (P7) |
 
 Unresolved references, unreadable paths and missing PSR-4 entries go to **stderr**. Each also
-produces a flag item (ADR-A009), so nothing in the bundle depends on the diagnostic stream.
+produces a flag item (ADR-A009), so nothing in the bundle depends on the diagnostic stream. So does
+an inherited member found in a project ancestor (S1, `inherited member: {subject} declared at
+{path}:{line} in {trait|parent} {FQCN}; body not fetched`), whose flag item carries the
+`inherited-member-declared` statement ([ADR-A028](decisions/ADR-A028-inherited-member-statement-gate-step.md) §5).
 
 One diagnostic class has **no** corresponding item: a successful negative result — a caller search
-that completes with zero call sites, or a changed file with no `use` block. It is recorded on stderr
+that completes with zero call sites, a changed file with no `use` block, or an inherited member
+whose ancestry leaves project code before declaring it (S2, `inherited member unresolved:
+{subject}; walked {types}; {reason} ({at})`, ADR-A028 §4). It is recorded on stderr
 (`caller search for reactivate( under app/: 0 call sites`) so the acceptance harness can tell "searched,
-found none" from "never searched"; it produces no bundle item and no flag (freeze review 05).
+found none" from "never searched"; it produces no bundle item and no flag (freeze review 05). S2
+is not mirrored into `diagnostics[]`; the enum is unchanged.
 
 The `lever: flagged` ASSUMPTION item is **retained** beside `diagnostics[]` rather than replaced by
 it. They serve different readers — the flag is context an agent acts on inside the bundle, and it is
