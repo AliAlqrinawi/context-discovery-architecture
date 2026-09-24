@@ -134,3 +134,43 @@ can be compared.
 - [ADR-A016](ADR-A016-oq6-the-available-facts-cannot-classify.md) — why the typo cannot be told apart.
 - [ADR-A010](ADR-A010-inheritance-and-annotation-traversal.md) — the one-file bound this stays inside.
 - Fixtures `experiment-13/` and `experiment-14/`.
+
+---
+
+## Addendum · 2026-09-24 · a fourth condition: the placed path is not the assertion's origin path
+
+**Source:** [ADR-A029](ADR-A029-recognised-forms-gate-step.md) §6 and the investigation that
+followed it. The text above is unaltered; the three conditions stand exactly as written.
+
+> **The surface is fetched only if, in addition, the path the `ClassLocator` places for the class
+> is not the file the assertion originated in.** The same condition is mirrored on the bare-class
+> route (`resolve()` → `surface()`), where it closes the one way it could otherwise be reached
+> today — a file that imports its own fully-qualified name.
+
+**Why.** ADR-A029's fourth recognised form would produce assertions whose subject is the
+*calling* class — which is the changed file. `surface()` slices every member the file declares.
+For a **created** file every slice is already filtered by `Diff::showsEntirely` (ADR-A019); for
+a **modified** file the fallback would fetch every *unchanged* sibling of the calling class,
+which the region never called and no reviewer asked for. The own-file move already fetches the
+called siblings as `same_file_reference`; the origin file is never a collaborator, and this
+fallback exists for collaborators.
+
+**Content-neutral today.** The condition can fire only when a placed path equals an origin path.
+Checked by running, not by argument: **0 of 189 `named_reference` assertions** across the eight
+succeeded backend runs (D1 ×4, ee5a2e6 ×2, 407c110 ×2; seven of them carry named references),
+the M26 golden's two assertions, and all ten `laravel-m1` scenarios. Every recorded bundle is
+byte-identical under the condition. **Its test is therefore synthetic** — a class that imports
+its own FQCN and calls `Self::undeclared(` — and the test was shown to fail with the condition
+reverted.
+
+**Shape.** Path identity, `$path === $assertion->originPath`, asked in full inside
+`unresolvedMemberSurface` per this ADR's own rule (*"asked in full here rather than assumed from
+the caller, so the boundary holds wherever this is called from"*). Not a class-name comparison:
+the harm is dumping a *file's* members, path is the unit ADR-A019 already reasons in, and
+**"no name is special-cased" holds** — nothing is excluded by what it is called.
+
+**What it does not do.** It does not touch M13's boundaries B1–B4: `Setting` is never the file
+that references `Setting::updateOrCreate`, so E5.1 and E5.2 fetch exactly as before. It does not
+bump `POLICY`: `LeverPolicy`, `ItemPriority` and `PremiseCatalogue` are unchanged. It lands
+alone, before ADR-A029's form, so that the form's tests inherit the invariant instead of
+discovering it; ADR-A029's three-changes-as-one is thereby two.

@@ -208,3 +208,23 @@ No sixth extractor. No new `AssertionKind`. No new lever.
   `src/Discovery/Extraction/NamedReferenceAssertionExtractor.php`,
   `src/Discovery/Extraction/OwnFileAssertionExtractor.php:85`,
   `tests/Unit/Discovery/Extraction/*Test.php`, `tests/Acceptance/fixtures/golden/`.
+
+---
+
+## Correction · 2026-09-24 · §6's chain ends differently, and three changes are two
+
+**Source:** the ADR-A020 investigation and addendum of this date. The text above is unaltered.
+
+§6 step 5 says the fallback would fetch *"the changed file's own class … the diff duplicated,
+which ADR-A018/A019 prohibit."* For a **created** file that is already blocked: `DiscoverContext`
+5c-i passes every fallback slice through `Diff::showsEntirely`, which returns true for any span
+in a new file, so nothing survives to become an item. The real exposure is a **modified** file:
+`surface()` slices every member the file declares, `showsEntirely` filters only those inside a
+changed region, and the fallback would fetch every *unchanged* sibling of the calling class — not
+the diff, but the rest of the file, which the region never called and no reviewer asked for.
+**The chain's conclusion stands; its stated harm does not.**
+
+With ADR-A020's fourth condition landed alone (its addendum, and the engine commit it names),
+§6's *three changes must land together* becomes **two**: the form (§3.3) and the premises with
+the D2 walk (ADR-A009, ADR-A010). The guard is in place before either, and its synthetic test
+pins the invariant they will inherit.
