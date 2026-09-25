@@ -223,3 +223,28 @@ Choosing the parent would pre-resolve a hop inside extraction and be wrong for t
 (`PersonalityResource::resolveLocale`, whose parent is `JsonResource` and whose member is in
 `ResolvesLocale`). The backend's subject-matching question (ADR-B002) should be read with this
 narrowing: a key that lists the calling-class subject beside the declaring site is sufficient.
+
+---
+
+## Correction · 2026-09-26 · §5's illustrative S2 sentence does not match the built walk
+
+**Source:** the option-B runs on `ec92403` and `ee5a2e6` (engine `6a77cdb`). The text above is
+unaltered.
+
+§5 illustrates S2 as *"getJson() is not declared in MenuPdfTest or in its project ancestor
+Tests\TestCase; its ancestry continues into Illuminate\Foundation\Testing\TestCase, which was
+not walked"*. That sentence assumes the walk reaches the parent chain. It does not, for these test
+classes: each `use`s `Illuminate\Foundation\Testing\RefreshDatabase`, a **dependency trait on the
+class itself**, and §6's rule that a member declared in a trait and a parent is not disambiguated
+(P6) makes a dependency trait a boundary *before* any parent is opened — whether the trait
+declares the member cannot be known without opening it. So the walk stops at hop zero and the
+stderr line reads `inherited member unresolved: Tests\Feature\MenuPdfTest::getJson; walked
+nothing; continues into a dependency, which was not walked
+(Illuminate\Foundation\Testing\RefreshDatabase)`; in the no-vendor run the reason is `names an
+ancestor the map cannot place`, same stop, same trait.
+
+The outcome is the one §4 chose — S2, a settled negative on stderr, no item, zero tokens — and
+`Tests\TestCase` is never asserted about, which is the property §5 was protecting. What was wrong
+is the illustration's assumed stop point, not the rule. The behaviour is tested
+(`AncestryResolverTest::testTheWalkStopsAtADependencyTraitEvenWhenAProjectParentMightDeclareTheMember`).
+

@@ -40,11 +40,11 @@ with its flag item, the S2 line without one, `diagnostics[]` unchanged), `05-tra
 (P3, X2 and R5 rows), ADR-A009 (eighth premise, its trigger, its template — the catalogue's
 first), ADR-A010 (addendum: the trigger fired; D2 relaxed for verification only, §4 and D1
 untouched), `evidence-gaps.md` §4 (the fetch read stays an under-build). `POLICY` is `3`; the
-M26 golden was regenerated: 3 assertions, 23 items, 624 tokens, from 2 / 22 / 562. **One question
-is open at ADR-A024** and is not decided here: whether S1's templated `items[].payload` is
-additive under the compatibility table (no `bundle_version` bump) or a change of meaning for
-`lever: flagged` (a bump). The engine carries `bundle_version` 2 as the reversible default until
-it is answered.
+M26 golden was regenerated: 3 assertions, 23 items, 624 tokens, from 2 / 22 / 562. The ADR-A024
+question — whether S1's templated `items[].payload` is additive — was left open when this was
+built and is answered by the ADR-A024 addendum of 2026-09-26: additive, `bundle_version` stays 2,
+the template is the bound. ADR-A028 §5's illustrative S2 sentence is corrected the same day: the
+walk stops at a test class's own `RefreshDatabase` trait, so it never reaches `Tests\TestCase`.
 
 **ADR-A029 accepted** — the last prerequisite gate for option B, `01-architecture.md` §3.3's
 recognised-forms table, opened and **nothing added**. The form: `$this->m(` where `m` is not

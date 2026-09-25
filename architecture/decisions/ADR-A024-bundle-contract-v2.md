@@ -219,3 +219,53 @@ version number exists to prevent, and it is the only kind a schema validator can
 - [ADR-A001](ADR-A001-php-cli-zero-dependencies.md) — why the validator is hand-written.
 - `schema/bundle-v2.schema.json`, `tests/Acceptance/BundleSchemaConformanceTest.php`,
   `tests/Acceptance/fixtures/golden/m26-bundle.v2.json`.
+
+---
+
+## Addendum (2026-09-26) — a templated flag payload is additive; `bundle_version` stays 2
+
+[ADR-A028](ADR-A028-inherited-member-statement-gate-step.md) §7 recorded the argument and left the
+decision here. Option B was built on the additive reading (engine `6a77cdb`, 2026-09-24) before
+this was written; that order was wrong — the gate should have been cleared before the constant was
+relied on — and is corrected by recording the decision now rather than by rewriting the commit.
+
+**Decision.** S1's `items[].payload` — the `inherited-member-declared` statement, rendered from
+ADR-A028 §5's template — is an **additive** change under the table above. `bundle_version` stays
+**2**.
+
+**Why it is not the last row.** The row that bumps is *"changing what a field means while keeping
+its name and type"*. `items[].payload` for `lever: flagged` means, per `03-interfaces.md`, *"the
+assumption sentence, nothing else"*. It still does: one sentence, beginning `ASSUMPTION:`, stating
+one premise a file could not settle, and nothing else — no slice, no second sentence, no structured
+sub-fields. A reader that treated the payload as an opaque sentence before treats it the same way
+now. What changed is that the sentence is no longer drawn from a set of seven constants; it is
+drawn from a set of seven constants **and one bounded template**.
+
+**Why the template does not reopen ADR-A009's ban.** ADR-A009 rejected composed flags because they
+were *"non-deterministic in practice and unbounded in scope"*. The reason was never that a sentence
+must be a literal; it was that a sentence must be reproducible and must not be able to say anything
+the engine did not verify. The S1 template has neither defect:
+
+- **Deterministic (P8).** Every slot — `{member}`, `{class}`, `{walked parents}`, `{trait|parent}`,
+  `{declaring FQCN}`, `{path}`, `{line}`, `{applier}` — is filled from a fact `AncestryResolver`
+  read from a file in the reviewed tree. Same tree, same bytes. The engine has interpolated exactly
+  this tuple onto stderr deterministically since M4.
+- **Bounded.** The slots are fixed by the template in `AssumptionWriter::STATEMENTS`; the values
+  are names, paths and line numbers; no slot can carry prose, a slice, or anything the walk did not
+  check. The "or in its parent" clause is present only when a parent was actually walked, so the
+  sentence never asserts anything about a file that was not opened.
+
+**The template is the bound.** The contract is not "payload is one of eight strings"; it is
+"payload is one sentence produced by the catalogue's fixed statements, of which one is a template
+whose slots are named in ADR-A009 and whose renderer is `inheritedMemberStatement()`". A second
+template would need its own ADR-A009 entry and the same argument made again on its own facts; this
+addendum clears one template, not the mechanism.
+
+**What would have bumped.** A payload that carried a slice beside the sentence, a second sentence,
+a structured object, or a slot filled from anything other than a verified file fact. None of these
+is what was built, and the conformance test still validates the payload as a string.
+
+**Cost, stated.** 62–63 tokens per S1 item, the longest flag in the catalogue by a factor of three.
+Measured on the three recorded commits: D1 `ec92403` 606 → 730, `ee5a2e6` 1078 → 1393, `407c110`
+unchanged. Whether that buys anything is the scoring question, not this one.
+
